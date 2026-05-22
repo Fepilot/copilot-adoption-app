@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Microsoft 365 Copilot Adoption Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+:root{
+  --blue:#0078D4;--dark:#003B73;--light-blue:#DEECF9;
+  --purple:#5C2D91;--green:#107C10;--teal:#008575;
+  --orange:#FF8C00;--red:#D13438;--yellow:#FFB900;
+  --g10:#FAF9F8;--g20:#F3F2F1;--g30:#EDEBE9;--g50:#D2D0CE;
+  --g90:#605E5C;--g130:#323130;
+  --radius:12px;--shadow:0 2px 8px rgba(0,0,0,0.08);--shadow-lg:0 8px 32px rgba(0,0,0,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--g10);color:var(--g130);line-height:1.6}
+
+/* ── SHARED HEADER ── */
+.app-header{background:linear-gradient(135deg,var(--dark),var(--blue) 60%,var(--purple));
+  color:#fff;padding:16px 32px;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;
+  box-shadow:var(--shadow-lg)}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{font-size:18px;font-weight:700;letter-spacing:-0.01em}
+.brand .sub{font-size:11px;opacity:0.75;margin-top:1px}
+.btn-ghost{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+  color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;
+  font-family:inherit;transition:0.2s;backdrop-filter:blur(4px)}
+.btn-ghost:hover{background:rgba(255,255,255,0.25)}
+
+/* ── LANDING PAGE ── */
+#page-landing{min-height:100vh;display:flex;flex-direction:column}
+.landing-hero{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px 24px 40px;text-align:center}
+.hero-title{font-size:40px;font-weight:800;color:var(--dark);letter-spacing:-0.02em;
+  margin-bottom:12px;line-height:1.15}
+.hero-title span{background:linear-gradient(90deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:17px;color:var(--g90);max-width:560px;margin:0 auto 40px}
+
+/* Upload zone */
+.upload-zone{width:100%;max-width:520px;min-height:180px;border:2.5px dashed var(--g50);
+  border-radius:16px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;padding:36px 24px;cursor:pointer;
+  transition:0.2s;background:#fff;box-shadow:var(--shadow)}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--blue);border-style:solid;
+  background:var(--light-blue);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.upload-icon{font-size:42px;pointer-events:none}
+.upload-main-text{font-size:16px;font-weight:700;color:var(--g130);pointer-events:none}
+.upload-sub-text{font-size:13px;color:var(--g90);pointer-events:none}
+.upload-badge{font-size:11px;background:var(--light-blue);color:var(--dark);
+  padding:3px 10px;border-radius:10px;font-weight:600}
+#fileInput{display:none}
+
+.privacy-note{margin-top:16px;font-size:12px;color:var(--g90);
+  display:flex;align-items:center;gap:6px}
+.privacy-note::before{content:'🔒';font-size:14px}
+
+/* Feature pills */
+.feature-grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+  max-width:680px;margin:40px auto 0}
+.feature-pill{background:#fff;border:1px solid var(--g30);border-radius:10px;
+  padding:10px 18px;font-size:13px;font-weight:600;color:var(--g130);
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:8px}
+.feature-pill .icon{font-size:18px}
+
+/* Expected columns card */
+.col-ref-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:24px 28px;max-width:700px;margin:32px auto 0;text-align:left}
+.col-ref-card h3{font-size:14px;font-weight:700;color:var(--dark);margin-bottom:14px}
+.col-group{margin-bottom:16px}
+.col-group h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;
+  color:var(--g90);margin-bottom:8px}
+.col-chips{display:flex;flex-wrap:wrap;gap:7px}
+.col-chip{padding:4px 10px;border-radius:6px;font-size:12px;font-family:monospace}
+.chip-req{background:#FFF1CC;color:#7A5700;border:1px solid #FFE080}
+.chip-opt{background:var(--g20);color:var(--g90);border:1px solid var(--g30)}
+.chip-auto{background:#DFF6DD;color:#0B6A0B;border:1px solid #92D050}
+
+/* ── SUMMARY PAGE ── */
+#page-summary{display:none;min-height:100vh;flex-direction:column}
+.summary-wrap{max-width:800px;margin:0 auto;padding:40px 24px}
+.summary-title{font-size:26px;font-weight:800;color:var(--dark);margin-bottom:6px}
+.summary-sub{color:var(--g90);margin-bottom:28px;font-size:14px}
+.meta-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.meta-card{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);
+  border-top:3px solid var(--blue)}
+.meta-label{font-size:11px;color:var(--g90);font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
+.meta-value{font-size:22px;font-weight:700;color:var(--dark);margin-top:4px}
+.col-map-table{background:#fff;border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow);margin-bottom:24px}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--g20)}
+th{padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.05em;color:var(--g90);text-align:left}
+td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
+.status-ok{color:var(--green);font-weight:700}
+.status-miss{color:var(--orange);font-weight:700}
+.attr-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.attr-chip{background:var(--light-blue);color:var(--dark);padding:6px 14px;
+  border-radius:20px;font-size:13px;font-weight:600;border:1px solid rgba(0,120,212,0.2)}
+.attr-chip .count{opacity:0.7;font-size:11px;margin-left:4px}
+.summary-actions{display:flex;gap:12px;justify-content:flex-end}
+.btn-primary{background:var(--blue);color:#fff;border:none;padding:12px 28px;
+  border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:0.2s;font-family:inherit}
+.btn-primary:hover{background:var(--dark);transform:translateY(-1px)}
+.btn-secondary{background:#fff;color:var(--g130);border:1px solid var(--g50);
+  padding:12px 22px;border-radius:10px;font-size:15px;cursor:pointer;
+  transition:0.2s;font-family:inherit}
+.btn-secondary:hover{background:var(--g20)}
+.err-banner{background:#FDE7E9;border-left:4px solid var(--red);padding:14px 18px;
+  border-radius:8px;font-size:14px;color:#A80000;margin-bottom:16px;display:none}
+
+/* ── LOADING PAGE ── */
+#page-loading{display:none;min-height:100vh;flex-direction:column;
+  align-items:center;justify-content:center;gap:24px}
+.spinner{width:56px;height:56px;border:5px solid var(--g30);
+  border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-steps{display:flex;flex-direction:column;gap:8px;min-width:280px}
+.loading-step{font-size:13px;color:var(--g90);display:flex;align-items:center;gap:10px}
+.loading-step.done{color:var(--green);font-weight:600}
+.loading-step.active{color:var(--blue);font-weight:600}
+
+/* ── DASHBOARD PAGE ── */
+#page-dashboard{display:none;flex-direction:column;min-height:100vh}
+.dash-header{background:linear-gradient(135deg,var(--dark),var(--blue) 60%,var(--purple));
+  color:#fff;padding:14px 28px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:200;box-shadow:var(--shadow-lg)}
+.dash-brand{display:flex;align-items:center;gap:12px}
+.dash-brand h2{font-size:16px;font-weight:700}
+.dash-brand .sub{font-size:11px;opacity:0.75;margin-top:1px}
+.dash-right{display:flex;align-items:center;gap:10px}
+
+/* Filter strip */
+.filter-strip{background:#fff;border-bottom:1px solid var(--g30);
+  padding:0;position:sticky;top:56px;z-index:199}
+.filter-header{display:flex;align-items:center;gap:12px;padding:8px 28px;
+  border-bottom:1px solid var(--g30);background:var(--g10)}
+.filter-toggle{background:var(--blue);color:#fff;border:none;padding:5px 14px;
+  border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:6px;transition:0.2s}
+.filter-toggle:hover{background:var(--dark)}
+.filter-toggle .arrow{transition:transform 0.2s;display:inline-block}
+.filter-toggle.open .arrow{transform:rotate(180deg)}
+.filter-body{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 28px;max-height:90px;overflow:hidden;transition:max-height 0.3s ease}
+.filter-body.expanded{max-height:600px;overflow-y:auto}
+.filter-lbl{font-size:11px;font-weight:700;color:var(--g90);
+  text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
+.filter-select{padding:5px 10px;border-radius:8px;border:1px solid var(--g50);
+  background:#fff;color:var(--g130);font-family:inherit;font-size:12px;cursor:pointer;min-width:120px;max-width:200px}
+.filter-select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px var(--light-blue)}
+.filter-sep{width:1px;height:20px;background:var(--g30);flex-shrink:0}
+.filter-active-count{font-size:11px;color:var(--blue);font-weight:600}
+.btn-clear-filters{background:none;border:1px solid var(--g50);color:var(--g90);
+  padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit}
+.btn-clear-filters:hover{background:var(--g20)}
+
+/* Tabs */
+.tabs-nav{background:#fff;border-bottom:1px solid var(--g30);padding:0 28px;
+  display:flex;gap:0;overflow-x:auto;position:sticky;top:auto;z-index:198}
+.tab-item{padding:12px 18px;font-size:13px;font-weight:600;cursor:pointer;
+  border-bottom:3px solid transparent;color:var(--g90);transition:0.2s;
+  white-space:nowrap;user-select:none}
+.tab-item:hover{color:var(--g130);background:var(--g10)}
+.tab-item.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* Pages */
+.page-wrap{max-width:1200px;margin:0 auto;padding:28px 28px 40px}
+.dash-page{display:none;animation:fadeUp 0.3s ease}
+.dash-page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sec-title{font-size:22px;font-weight:800;color:var(--dark);margin-bottom:4px;letter-spacing:-0.01em}
+.sec-sub{font-size:14px;color:var(--g90);margin-bottom:22px;line-height:1.7}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:20px 22px;border-top:4px solid var(--blue);transition:0.2s}
+.kpi-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.kpi-card.p{border-top-color:var(--purple)}
+.kpi-card.g{border-top-color:var(--green)}
+.kpi-card.t{border-top-color:var(--teal)}
+.kpi-lbl{font-size:11px;font-weight:700;color:var(--g90);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px}
+.kpi-val{font-size:28px;font-weight:800;color:var(--dark);line-height:1.1}
+.kpi-sub{font-size:12px;color:var(--g90);margin-top:4px}
+
+/* Chart cards */
+.grid-2{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px}
+.grid-1{margin-bottom:18px}
+.chart-card{background:#fff;border-radius:var(--radius);padding:20px 18px 12px;box-shadow:var(--shadow)}
+.chart-card h3{margin:0 0 10px;font-size:14px;font-weight:700;color:var(--g90)}
+.chart-note{font-size:11px;color:#9ea3b5;margin-top:6px;line-height:1.5}
+
+/* Alert */
+.alert{padding:14px 18px;border-radius:10px;margin-bottom:18px;
+  display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.7}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:2px}
+.alert-cnt{flex:1}
+.alert-title{font-weight:700;margin-bottom:4px;font-size:14px}
+.alert-blue{background:var(--light-blue);border-left:4px solid var(--blue)}
+.alert-green{background:#DFF6DD;border-left:4px solid var(--green)}
+.alert-yellow{background:#FFF8E1;border-left:4px solid var(--yellow)}
+.alert-red{background:#FDE7E9;border-left:4px solid var(--red)}
+
+/* Insight cards */
+.ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.ins-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:22px;border-left:4px solid var(--blue)}
+.ins-card.ap{border-left-color:var(--purple)}
+.ins-card.ag{border-left-color:var(--green)}
+.ins-card.at{border-left-color:var(--teal)}
+.ins-title{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:10px}
+.ins-body{font-size:13px;color:var(--g90);line-height:1.7}
+.ins-body ul{margin-left:1.2rem}
+.ins-body li{margin-bottom:5px}
+.ins-body strong{color:var(--g130)}
+.ins-rec{margin-top:12px;padding:12px;background:var(--g10);border-radius:8px;border-left:3px solid var(--green)}
+.ins-rec strong{color:#0B6A0B;font-size:11px;text-transform:uppercase;letter-spacing:0.04em}
+.ins-rec ul{margin-left:1.2rem;margin-top:6px;font-size:12px;line-height:1.6;color:var(--g130)}
+
+/* Progress bars */
+.prog-group{margin-bottom:12px}
+.prog-lbl{display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;font-weight:600;color:var(--g130)}
+.prog-bg{height:8px;background:var(--g30);border-radius:99px;overflow:hidden}
+.prog-bar{height:100%;border-radius:99px;transition:width 1.2s ease}
+.bar-blue{background:linear-gradient(90deg,var(--blue),#4DA6FF)}
+.bar-purple{background:linear-gradient(90deg,var(--purple),#9B6FD1)}
+.bar-green{background:linear-gradient(90deg,var(--green),#5FB85F)}
+.bar-teal{background:linear-gradient(90deg,var(--teal),#33B5A5)}
+
+/* Benchmark table */
+.bench-table{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:22px}
+.badge{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-green{background:#DFF6DD;color:#0B6A0B}
+.badge-blue{background:var(--light-blue);color:var(--dark)}
+.badge-yellow{background:#FFF8E1;color:#8A6D00}
+.badge-red{background:#FDE7E9;color:#A80000}
+
+/* Recommendation cards */
+.rec-section{background:linear-gradient(135deg,var(--light-blue),#EDE0F7 80%);
+  border-radius:var(--radius);padding:26px;margin-bottom:22px}
+.rec-section h3{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:14px}
+.rec-item{background:#fff;padding:16px 18px;border-radius:10px;
+  margin-bottom:10px;border-left:4px solid var(--blue)}
+.rec-item h4{font-size:14px;font-weight:700;color:var(--g130);margin-bottom:4px}
+.rec-item p{font-size:13px;color:var(--g90);line-height:1.7}
+.pri-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.pri-hi{background:#FDE7E9;color:#A80000}
+.pri-med{background:#FFF8E1;color:#8A6D00}
+.pri-lo{background:var(--light-blue);color:var(--dark)}
+
+/* Health score */
+.health-box{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:22px;margin-bottom:22px;display:flex;gap:22px;align-items:center}
+.health-circle{width:86px;height:86px;border-radius:50%;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  flex-shrink:0;color:#fff;font-weight:800}
+.health-circle .score{font-size:26px;line-height:1}
+.health-circle .lbl{font-size:10px;margin-top:2px;opacity:0.9;text-transform:uppercase}
+.health-detail h3{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:5px}
+.health-detail p{font-size:13px;color:var(--g90);line-height:1.7}
+
+/* No-data message */
+.no-data{text-align:center;padding:40px;color:var(--g90);font-size:13px}
+.no-data .icon{font-size:32px;margin-bottom:10px}
+
+/* Footer */
+.footer{text-align:center;padding:18px;font-size:12px;color:var(--g90);
+  border-top:1px solid var(--g30);margin-top:8px}
+
+/* Responsive */
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .grid-2,.ins-grid,.meta-cards{grid-template-columns:1fr}
+  .page-wrap,.summary-wrap{padding:16px}
+  .tabs-nav{padding:0 16px}
+  .dash-header{padding:12px 16px}
+  .hero-title{font-size:28px}
+}
+@media(max-width:580px){.kpi-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PAGE: LANDING
+══════════════════════════════════════════════════════════════════════════ -->
+<div id="page-landing">
+  <header class="app-header">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 23 23" fill="none">
+        <rect width="11" height="11" fill="#F25022"/>
+        <rect x="12" width="11" height="11" fill="#7FBA00"/>
+        <rect y="12" width="11" height="11" fill="#00A4EF"/>
+        <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
+      </svg>
+      <div>
+        <h1>Microsoft 365 Copilot Adoption Dashboard</h1>
+        <div class="sub">Powered by Viva Insights &nbsp;&middot;&nbsp; Client-side &nbsp;&middot;&nbsp; No data leaves your browser</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="landing-hero">
+    <h2 class="hero-title">Instant <span>Copilot Analytics</span><br>from your Viva Insights export</h2>
+    <p class="hero-sub">Upload your Person Query CSV and get a fully interactive, Microsoft-branded adoption dashboard &mdash; with Frontier Firm benchmarks, insights, and recommendations &mdash; in seconds.</p>
+
+    <div class="upload-zone" id="uploadZone">
+      <div class="upload-icon">📊</div>
+      <div class="upload-main-text">Drag &amp; drop your CSV here</div>
+      <div class="upload-sub-text">or click to browse files</div>
+      <span class="upload-badge">Viva Insights Person Query export</span>
+      <input type="file" id="fileInput" accept=".csv,text/csv"/>
+    </div>
+
+    <p class="privacy-note">All analysis runs locally in your browser. No data is uploaded to any server.</p>
+
+    <div class="feature-grid">
+      <div class="feature-pill"><span class="icon">📈</span>7-Tab Interactive Dashboard</div>
+      <div class="feature-pill"><span class="icon">🏢</span>Auto-Detected Attribute Filters</div>
+      <div class="feature-pill"><span class="icon">🚀</span>Frontier Firm Benchmarks</div>
+      <div class="feature-pill"><span class="icon">🧠</span>Insights &amp; Recommendations</div>
+      <div class="feature-pill"><span class="icon">🔒</span>100% Client-Side Processing</div>
+      <div class="feature-pill"><span class="icon">⚡</span>No Code, No Install Required</div>
+    </div>
+
+    <div class="col-ref-card">
+      <h3>What columns does the CSV need?</h3>
+      <div class="col-group">
+        <h4>Required (the dashboard won't run without these)</h4>
+        <div class="col-chips">
+          <span class="col-chip chip-req">PersonId</span>
+          <span class="col-chip chip-req">MetricDate</span>
+          <span class="col-chip chip-req">Total Copilot actions taken</span>
+          <span class="col-chip chip-req">Total Copilot active days</span>
+        </div>
+      </div>
+      <div class="col-group">
+        <h4>Optional (enables richer charts)</h4>
+        <div class="col-chips">
+          <span class="col-chip chip-opt">Copilot chat (work) prompts submitted</span>
+          <span class="col-chip chip-opt">Copilot actions taken in Excel</span>
+          <span class="col-chip chip-opt">Copilot actions taken in Outlook</span>
+          <span class="col-chip chip-opt">Summarize chat actions taken using Copilot in Teams</span>
+        </div>
+      </div>
+      <div class="col-group">
+        <h4>Auto-detected as filters (any string column with &le; 200 unique values)</h4>
+        <div class="col-chips">
+          <span class="col-chip chip-auto">Organization</span>
+          <span class="col-chip chip-auto">Country</span>
+          <span class="col-chip chip-auto">Division</span>
+          <span class="col-chip chip-auto">LevelDesignation</span>
+          <span class="col-chip chip-auto">FunctionType</span>
+          <span class="col-chip chip-auto">Manager</span>
+          <span class="col-chip chip-auto">…and any other attribute</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PAGE: SUMMARY / COLUMN CONFIRMATION
+══════════════════════════════════════════════════════════════════════════ -->
+<div id="page-summary">
+  <header class="app-header">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 23 23" fill="none">
+        <rect width="11" height="11" fill="#F25022"/>
+        <rect x="12" width="11" height="11" fill="#7FBA00"/>
+        <rect y="12" width="11" height="11" fill="#00A4EF"/>
+        <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
+      </svg>
+      <div>
+        <h1>Microsoft 365 Copilot Adoption Dashboard</h1>
+        <div class="sub">CSV loaded &mdash; review and confirm before analysis</div>
+      </div>
+    </div>
+  </header>
+  <div class="summary-wrap">
+    <h2 class="summary-title">✓ CSV Loaded Successfully</h2>
+    <p class="summary-sub">Review what was detected in your file, then click <strong>Analyze Dashboard</strong> to proceed.</p>
+
+    <div id="summaryErrBanner" class="err-banner"></div>
+
+    <div class="meta-cards">
+      <div class="meta-card"><div class="meta-label">Total Rows</div><div class="meta-value" id="metaRows">—</div></div>
+      <div class="meta-card" style="border-top-color:var(--purple)"><div class="meta-label">Unique Users</div><div class="meta-value" id="metaUsers">—</div></div>
+      <div class="meta-card" style="border-top-color:var(--green)"><div class="meta-label">Weeks</div><div class="meta-value" id="metaWeeks">—</div></div>
+      <div class="meta-card" style="border-top-color:var(--teal)"><div class="meta-label">Date Range</div><div class="meta-value" id="metaDates" style="font-size:14px;margin-top:6px">—</div></div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:12px">Column Detection</h3>
+    <div class="col-map-table">
+      <table>
+        <thead><tr><th>Role</th><th>Detected Column</th><th>Override</th><th>Status</th></tr></thead>
+        <tbody id="colMapBody"></tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:12px">Attribute Filters Auto-Detected</h3>
+    <div id="attrChips" class="attr-chips"></div>
+    <p id="noAttrMsg" style="font-size:13px;color:var(--g90);display:none;margin-bottom:24px">No attribute columns detected. All data will be shown together without filters.</p>
+
+    <div class="summary-actions">
+      <button class="btn-secondary" onclick="goToLanding()">← Upload Different File</button>
+      <button class="btn-primary" id="btnAnalyze" onclick="startAnalysis()">Analyze Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PAGE: LOADING
+══════════════════════════════════════════════════════════════════════════ -->
+<div id="page-loading">
+  <header class="app-header" style="position:relative;top:auto">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 23 23" fill="none">
+        <rect width="11" height="11" fill="#F25022"/>
+        <rect x="12" width="11" height="11" fill="#7FBA00"/>
+        <rect y="12" width="11" height="11" fill="#00A4EF"/>
+        <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
+      </svg>
+      <div><h1>Microsoft 365 Copilot Adoption Dashboard</h1></div>
+    </div>
+  </header>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px">
+    <div class="spinner"></div>
+    <div style="text-align:center">
+      <div style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:6px">Analyzing your data…</div>
+      <div style="font-size:13px;color:var(--g90)">Computing metrics, segments, and insights</div>
+    </div>
+    <div class="loading-steps" id="loadingSteps">
+      <div class="loading-step" id="ls1">⏳ Parsing CSV rows…</div>
+      <div class="loading-step" id="ls2">⏳ Computing proficiency tiers…</div>
+      <div class="loading-step" id="ls3">⏳ Computing 12-week usage segments…</div>
+      <div class="loading-step" id="ls4">⏳ Computing loyalty &amp; churn…</div>
+      <div class="loading-step" id="ls5">⏳ Building insights &amp; recommendations…</div>
+      <div class="loading-step" id="ls6">⏳ Preparing dashboard…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PAGE: DASHBOARD
+══════════════════════════════════════════════════════════════════════════ -->
+<div id="page-dashboard">
+  <header class="dash-header">
+    <div class="dash-brand">
+      <svg width="26" height="26" viewBox="0 0 23 23" fill="none">
+        <rect width="11" height="11" fill="#F25022"/>
+        <rect x="12" width="11" height="11" fill="#7FBA00"/>
+        <rect y="12" width="11" height="11" fill="#00A4EF"/>
+        <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
+      </svg>
+      <div>
+        <h2>Microsoft 365 Copilot Adoption Dashboard</h2>
+        <div class="sub" id="dashSubtitle">Viva Insights Person Query</div>
+      </div>
+    </div>
+    <div class="dash-right">
+      <button class="btn-ghost" onclick="goToLanding()">← New File</button>
+    </div>
+  </header>
+
+  <div class="filter-strip" id="filterStrip"></div>
+
+  <nav class="tabs-nav" id="tabsNav">
+    <div class="tab-item active" data-tab="overview">Executive Summary</div>
+    <div class="tab-item" data-tab="trends">Weekly Trends</div>
+    <div class="tab-item" data-tab="apps">App Usage</div>
+    <div class="tab-item" data-tab="segments">User Segmentation</div>
+    <div class="tab-item" data-tab="loyalty">Loyalty &amp; Churn</div>
+    <div class="tab-item" data-tab="power">Power Users</div>
+    <div class="tab-item" data-tab="insights">Insights &amp; Recommendations</div>
+  </nav>
+
+  <div class="page-wrap">
+    <!-- Executive Summary -->
+    <div class="dash-page active" id="tab-overview">
+      <h2 class="sec-title">Executive Summary</h2>
+      <p class="sec-sub">Key adoption metrics for the most recent week on record.</p>
+      <div class="kpi-row" id="kpiRow"></div>
+      <div id="overviewAlert"></div>
+      <div class="ins-grid" id="overviewInsights"></div>
+    </div>
+
+    <!-- Weekly Trends -->
+    <div class="dash-page" id="tab-trends">
+      <h2 class="sec-title">Weekly Adoption Trends</h2>
+      <p class="sec-sub">View of total Copilot actions, chat prompts, and weekly active users over time.</p>
+      <div class="grid-1 chart-card">
+        <h3>Total Copilot Actions &amp; Chat Prompts (left axis) &nbsp;&middot;&nbsp; Active Users (right axis)</h3>
+        <div id="chartTrends" style="height:340px"></div>
+      </div>
+    </div>
+
+    <!-- App Usage -->
+    <div class="dash-page" id="tab-apps">
+      <h2 class="sec-title">App Usage Breakdown</h2>
+      <p class="sec-sub">Copilot actions disaggregated by Microsoft 365 application available in this query.</p>
+      <div id="appChartsSection">
+        <div class="grid-2">
+          <div class="chart-card">
+            <h3>Actions by App &mdash; Weekly</h3>
+            <div id="chartAppBar" style="height:300px"></div>
+          </div>
+          <div class="chart-card">
+            <h3>App Share &mdash; All Weeks</h3>
+            <div id="chartAppDonut" style="height:300px"></div>
+          </div>
+        </div>
+      </div>
+      <div id="appNoData" class="no-data" style="display:none">
+        <div class="icon">📊</div>
+        <div>App-level columns (Excel, Outlook, Teams) not found in this CSV.<br>Enable them in Viva Insights query settings.</div>
+      </div>
+      <div id="heatmapSection">
+        <div class="chart-card">
+          <h3 id="heatmapTitle">Average Weekly Copilot Actions per User &mdash; by Group (Last 4 Weeks)</h3>
+          <div id="chartHeatmap" style="min-height:380px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Segmentation -->
+    <div class="dash-page" id="tab-segments">
+      <h2 class="sec-title">User Segmentation</h2>
+      <p class="sec-sub">Proficiency tiers based on Copilot active days per week: L1 Beginner (1&ndash;2 days) &nbsp;&middot;&nbsp; L2 Intermediate (3&ndash;4) &nbsp;&middot;&nbsp; L3 Expert (5+)</p>
+      <div class="grid-2">
+        <div class="chart-card">
+          <h3>Users by Proficiency Tier &mdash; Weekly</h3>
+          <div id="chartLtierBar" style="height:300px"></div>
+        </div>
+        <div class="chart-card">
+          <h3>Tier Distribution &mdash; Latest Week</h3>
+          <div id="chartLtierDonut" style="height:300px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loyalty & Churn -->
+    <div class="dash-page" id="tab-loyalty">
+      <h2 class="sec-title">Loyalty &amp; Churn</h2>
+      <p class="sec-sub">Weekly classification into New, Loyal, and Churned users using a 4-week lookback window.</p>
+      <div class="grid-1 chart-card">
+        <h3>New &middot; Loyal &middot; Churned Users per Week</h3>
+        <div id="chartLoyalty" style="height:320px"></div>
+        <p class="chart-note">Loyal = active in every one of the 4 preceding weeks &nbsp;&middot;&nbsp; Churned = active in prior 4 weeks but not this week &nbsp;&middot;&nbsp; New = first-time active</p>
+      </div>
+    </div>
+
+    <!-- Power Users -->
+    <div class="dash-page" id="tab-power">
+      <h2 class="sec-title">Power &amp; Habitual Users</h2>
+      <p class="sec-sub">12-week rolling usage segments (vivainsights methodology). Power User: habit &amp; avg &ge; 15 actions/wk &nbsp;&middot;&nbsp; Habitual: IsHabit (active in &ge;9/12 weeks) &nbsp;&middot;&nbsp; Novice: avg &ge; 1</p>
+      <div class="grid-2">
+        <div class="chart-card">
+          <h3>Usage Segments &mdash; Weekly Trend</h3>
+          <div id="chartSegBar" style="height:300px"></div>
+        </div>
+        <div class="chart-card">
+          <h3>Segment Distribution &mdash; Latest Week</h3>
+          <div id="chartSegDonut" style="height:300px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insights & Recommendations -->
+    <div class="dash-page" id="tab-insights">
+      <h2 class="sec-title">Insights &amp; Recommendations</h2>
+      <p class="sec-sub">Data-driven interpretation benchmarked against Microsoft Frontier Firm research and Work Trend Index.</p>
+      <div id="insightsContent"></div>
+    </div>
+  </div>
+
+  <footer class="footer" id="dashFooter">
+    Microsoft 365 Copilot Adoption Dashboard &nbsp;&middot;&nbsp; Viva Insights Person Query &nbsp;&middot;&nbsp; Microsoft Internal
+  </footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════════
+const C = {
+  blue:'#0078D4', dark:'#003B73', lblue:'#DEECF9',
+  purple:'#5C2D91', green:'#107C10', teal:'#008575',
+  orange:'#FF8C00', red:'#D13438', yellow:'#FFB900',
+  g10:'#FAF9F8', g20:'#F3F2F1', g30:'#EDEBE9', g90:'#605E5C', g130:'#323130'
+};
+const PC = {
+  responsive:true, displayModeBar:true, displaylogo:false,
+  modeBarButtonsToRemove:['toImage','sendDataToCloud','zoom2d','pan2d',
+    'select2d','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d',
+    'hoverClosestCartesian','hoverCompareCartesian','toggleSpikelines']
+};
+const PB = {
+  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+  font:{family:'Segoe UI, Arial, sans-serif', color:C.g130, size:12},
+  margin:{l:20, r:20, t:40, b:40},
+  legend:{orientation:'h', yanchor:'bottom', y:1.02, xanchor:'right', x:1}
+};
+const AX = {gridcolor:C.g30, zerolinecolor:C.g30, linecolor:C.g30, tickfont:{size:11,color:C.g90}};
+// Deep-clone helpers — Plotly mutates layout objects internally, so we MUST
+// pass a fresh deep copy on every Plotly.react call to prevent cross-chart corruption.
+function freshAx(extra){ return Object.assign({}, JSON.parse(JSON.stringify(AX)), extra||{}); }
+function freshLayout(extra){ return Object.assign({}, JSON.parse(JSON.stringify(PB)), extra||{}); }
+const SEG_COLORS = {
+  'Power User':C.dark, 'Habitual User':C.blue, 'Novice User':'#6CB8F6',
+  'Low User':'#B3D6F7', 'Non-user':C.g30
+};
+const LTIER_COLORS = {
+  'L3 Expert':C.dark, 'L2 Intermediate':C.blue,
+  'L1 Beginner':'#6CB8F6', 'Inactive':C.g30
+};
+const APP_COLORS = {Excel:'#217346', Outlook:C.blue, Teams:'#5B5EA6'};
+const METRIC_PATTERNS = {
+  pid:    /^(personid|person_id|userid|user_id|employeeid|empid)$/,
+  date:   /^(metricdate|metric_date|date|weekdate|week_date|weekstart|periodstart|startdate)$/,
+  total:  /totalcopilotaction|total.*copilot.*action|copilot.*total.*action/,
+  active: /totalcopilotactiveday|total.*copilot.*active.*day|activedays/,
+  prompts:/copilotchat.*prompt|chat.*prompt|promptssubmitted|copilotprompt/,
+  excel:  /copilot.*excel|excel.*action|excelcopilot/,
+  outlook:/copilot.*outlook|outlook.*action|outlookcopilot/,
+  teams:  /summarize.*teams|teams.*summarize|teamschat|copilot.*teams.*chat/
+};
+const SKIP_COLS = new Set(['weekenddays','isactive','populationtype','isinternal',
+  'ismanager','isoccupied','fte','layercount']);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let ENRICHED_ROWS = [];   // All rows with ltier + usageSeg pre-computed
+let COL_MAP = {};         // { pid, date, total, active, prompts, excel, outlook, teams }
+let ATTR_COLS = [];       // ['Organization', 'Country', ...]
+let ATTR_VALUES = {};     // { 'Organization': ['All','A','B',...], ... }
+let ACTIVE_FILTERS = {};  // { 'Organization': 'All', ... }
+let RAW_CSV_ROWS = [];    // Raw PapaParse rows for column override
+let ALL_HEADERS = [];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════
+function norm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+function fmtNum(n){ return Number(n).toLocaleString(); }
+function fmtPct(n){ return Math.round(n*10)/10 + '%'; }
+function toISO(ms){
+  const d = new Date(ms);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function toLbl(ms){
+  return new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function parseDate(str){
+  if (!str) return null;
+  str = String(str).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) return new Date(str).getTime();
+  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[1]-1, +m[2]).getTime();
+  const t = Date.parse(str);
+  return isNaN(t) ? null : t;
+}
+function n2(x){ return isNaN(+x) ? 0 : +x; }
+function unique(arr){ return [...new Set(arr)].filter(Boolean); }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COLUMN DETECTION
+// ═══════════════════════════════════════════════════════════════════════════
+function detectColumns(headers, rows){
+  const normalized = headers.map(norm);
+  const colMap = {};
+  for (const [key, pat] of Object.entries(METRIC_PATTERNS)){
+    for (let i = 0; i < normalized.length; i++){
+      if (pat.test(normalized[i])){ colMap[key] = headers[i]; break; }
+    }
+    if (!colMap[key]) colMap[key] = null;
+  }
+  const metricSet = new Set(Object.values(colMap).filter(Boolean));
+  const attrCols = [];
+  for (let i = 0; i < headers.length; i++){
+    const h = headers[i];
+    const ng = normalized[i];
+    if (metricSet.has(h) || SKIP_COLS.has(ng)) continue;
+    const sample = rows.slice(0, 500).map(r => r[h]).filter(v => v !== '' && v != null);
+    const uniq = new Set(sample);
+    if (uniq.size >= 2 && uniq.size <= 200) attrCols.push(h);
+  }
+  return { colMap, attrCols };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA PARSING & ENRICHMENT
+// ═══════════════════════════════════════════════════════════════════════════
+function parseAndEnrich(rawRows, cm){
+  const rows = rawRows.map(r => {
+    const rec = {
+      pid:     String(r[cm.pid]||'').trim(),
+      dateMs:  parseDate(r[cm.date]),
+      total:   n2(r[cm.total]),
+      active:  n2(r[cm.active]),
+      prompts: cm.prompts ? n2(r[cm.prompts]) : 0,
+      excel:   cm.excel   ? n2(r[cm.excel])   : 0,
+      outlook: cm.outlook ? n2(r[cm.outlook]) : 0,
+      teams:   cm.teams   ? n2(r[cm.teams])   : 0,
+    };
+    // Copy attribute columns
+    for (const a of ATTR_COLS) rec[a] = String(r[a]||'').trim();
+    return rec;
+  }).filter(r => r.pid && r.dateMs !== null);
+
+  // Add L-tiers
+  for (const r of rows){
+    if (r.active >= 5)      r.ltier = 'L3 Expert';
+    else if (r.active >= 3) r.ltier = 'L2 Intermediate';
+    else if (r.active >= 1) r.ltier = 'L1 Beginner';
+    else                    r.ltier = 'Inactive';
+    r.dateISO = toISO(r.dateMs);
+  }
+
+  // Add usage segments (12-week rolling per person)
+  const personMap = new Map();
+  for (const r of rows){
+    if (!personMap.has(r.pid)) personMap.set(r.pid, []);
+    personMap.get(r.pid).push(r);
+  }
+  for (const prows of personMap.values()){
+    prows.sort((a,b) => a.dateMs - b.dateMs);
+    for (let i = 0; i < prows.length; i++){
+      const win = prows.slice(Math.max(0, i-11), i+1);
+      const roll12avg = win.reduce((s,r) => s+r.total,0) / win.length;
+      const activeWks = win.filter(r => r.total >= 1).length;
+      const isHabit = activeWks >= 9;
+      if (isHabit && roll12avg >= 15)     prows[i].usageSeg = 'Power User';
+      else if (isHabit)                   prows[i].usageSeg = 'Habitual User';
+      else if (roll12avg >= 1)            prows[i].usageSeg = 'Novice User';
+      else if (roll12avg > 0)             prows[i].usageSeg = 'Low User';
+      else                                prows[i].usageSeg = 'Non-user';
+    }
+  }
+  return rows;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FILTER MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════
+function getFilteredRows(){
+  return ENRICHED_ROWS.filter(r => {
+    for (const [col, val] of Object.entries(ACTIVE_FILTERS)){
+      if (val !== 'All' && r[col] !== val) return false;
+    }
+    return true;
+  });
+}
+function activeFilterCount(){
+  return Object.values(ACTIVE_FILTERS).filter(v => v !== 'All').length;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA PROCESSING
+// ═══════════════════════════════════════════════════════════════════════════
+function buildKpis(rows){
+  const weeks = unique(rows.map(r => r.dateMs)).sort((a,b)=>a-b);
+  const latest = weeks[weeks.length-1];
+  const dw = rows.filter(r => r.dateMs === latest);
+  const pids = new Set(dw.map(r => r.pid));
+  const activePids = new Set(dw.filter(r => r.total > 0).map(r => r.pid));
+  const tot = pids.size, act = activePids.size;
+  const actAvg = act > 0 ? Math.round(dw.filter(r=>r.total>0).reduce((s,r)=>s+r.total,0)/act*10)/10 : 0;
+  return {
+    active: act, total: tot, pct: tot ? Math.round(100*act/tot*10)/10 : 0,
+    actions: fmtNum(dw.reduce((s,r)=>s+r.total,0)),
+    avgActions: actAvg,
+    prompts: fmtNum(dw.reduce((s,r)=>s+r.prompts,0)),
+    latestWeek: new Date(latest).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+  };
+}
+
+function loyaltyChurn(rows){
+  const weeks = unique(rows.map(r => r.dateMs)).sort((a,b)=>a-b);
+  return weeks.map((wk, wi) => {
+    const wRows = rows.filter(r => r.dateMs === wk);
+    const activeNow = new Set(wRows.filter(r => r.total > 0).map(r => r.pid));
+    const priorWks = weeks.slice(Math.max(0, wi-4), wi);
+    const priorRows = rows.filter(r => priorWks.includes(r.dateMs));
+    const everPrior = new Set(priorRows.filter(r => r.total > 0).map(r => r.pid));
+    // Loyal = active in ALL prior weeks
+    const pidWkSets = {};
+    priorRows.filter(r => r.total > 0).forEach(r => {
+      if (!pidWkSets[r.pid]) pidWkSets[r.pid] = new Set();
+      pidWkSets[r.pid].add(r.dateMs);
+    });
+    const allActivePrior = new Set(
+      priorWks.length > 0
+        ? Object.entries(pidWkSets).filter(([,s])=>s.size===priorWks.length).map(([p])=>p)
+        : []
+    );
+    return {
+      dateISO: toISO(wk),
+      newUsers:     [...activeNow].filter(p => !everPrior.has(p)).length,
+      loyalUsers:   [...activeNow].filter(p => allActivePrior.has(p)).length,
+      churnedUsers: [...everPrior].filter(p => !activeNow.has(p)).length,
+      activeUsers:  activeNow.size
+    };
+  });
+}
+
+function buildInsights(rows){
+  const weeks = unique(rows.map(r=>r.dateMs)).sort((a,b)=>a-b);
+  const latest = weeks[weeks.length-1];
+  const dw = rows.filter(r => r.dateMs === latest);
+  const totalU = new Set(dw.map(r=>r.pid)).size;
+  const activeU = new Set(dw.filter(r=>r.total>0).map(r=>r.pid)).size;
+  const pctAct = totalU ? Math.round(100*activeU/totalU*10)/10 : 0;
+
+  const first4 = weeks.slice(0,4);
+  const last4  = weeks.slice(-4);
+  const sum1 = rows.filter(r=>first4.includes(r.dateMs)).reduce((s,r)=>s+r.total,0);
+  const sum2 = rows.filter(r=>last4.includes(r.dateMs)).reduce((s,r)=>s+r.total,0);
+  const avg1 = sum1 / Math.max(1,first4.length);
+  const avg2 = sum2 / Math.max(1,last4.length);
+  const trendPct = Math.round((avg2-avg1)/Math.max(1,avg1)*100*10)/10;
+  const trendDir = trendPct >= 0 ? 'up' : 'down';
+
+  const phUsers = new Set(dw.filter(r=>['Power User','Habitual User'].includes(r.usageSeg)).map(r=>r.pid));
+  const pwUsers = new Set(dw.filter(r=>r.usageSeg==='Power User').map(r=>r.pid));
+  const hbUsers = new Set(dw.filter(r=>r.usageSeg==='Habitual User').map(r=>r.pid));
+  const pctPH = totalU ? Math.round(100*phUsers.size/totalU*10)/10 : 0;
+
+  const l3Users = new Set(dw.filter(r=>r.ltier==='L3 Expert').map(r=>r.pid));
+  const pctL3 = totalU ? Math.round(100*l3Users.size/totalU*10)/10 : 0;
+
+  const lc = loyaltyChurn(rows);
+  const latestLC = lc[lc.length-1] || {newUsers:0,loyalUsers:0,churnedUsers:0};
+  const ncRatio = Math.round(latestLC.newUsers / Math.max(1,latestLC.churnedUsers)*100)/100;
+
+  const appTotals = {
+    Excel:   rows.reduce((s,r)=>s+r.excel,0),
+    Outlook: rows.reduce((s,r)=>s+r.outlook,0),
+    Teams:   rows.reduce((s,r)=>s+r.teams,0)
+  };
+  const appSum = Object.values(appTotals).reduce((a,b)=>a+b,0);
+  const topApp = Object.entries(appTotals).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'Excel';
+  const topAppPct = appSum > 0 ? Math.round(100*appTotals[topApp]/appSum*10)/10 : 0;
+  const avgActions = activeU > 0 ? Math.round(dw.filter(r=>r.total>0).reduce((s,r)=>s+r.total,0)/activeU*10)/10 : 0;
+
+  const adoptionStage = pctAct >= 70 ? 'Frontier Firm' : pctAct >= 50 ? 'Developing' : 'Early Stage';
+  const habitStage = pctPH >= 20 ? 'at Frontier Firm benchmark' : pctPH >= 10 ? 'approaching Frontier Firm benchmark' : 'below Frontier Firm benchmark';
+  const retentionHealth = ncRatio >= 1.2 ? 'Growing' : ncRatio >= 0.8 ? 'Stable' : 'At-Risk';
+
+  const pb_active = Math.min(Math.round(pctAct/70*100), 100);
+  const pb_ph     = Math.min(Math.round(pctPH/20*100), 100);
+  const pb_l3     = Math.min(Math.round(pctL3/25*100), 100);
+  const pb_loyal  = activeU > 0 ? Math.min(Math.round(latestLC.loyalUsers/activeU*100), 100) : 0;
+
+  const healthScore = Math.round(
+    (pctAct/100*0.3 + Math.min(pctPH/20,1)*0.3 + Math.min(pctL3/25,1)*0.2 + Math.min(ncRatio/1.2,1)*0.2)*100
+  );
+  const healthLabel = healthScore >= 75 ? 'Strong' : healthScore >= 50 ? 'Developing' : 'Early Stage';
+  const healthColor = healthScore >= 75 ? C.green : healthScore >= 50 ? C.orange : C.red;
+
+  return {
+    pctAct, activeU, totalU, trendPct, trendDir,
+    pctPH, phCount: phUsers.size, powerCount: pwUsers.size, habitualCount: hbUsers.size,
+    pctL3, l3Count: l3Users.size,
+    newU: latestLC.newUsers, loyalU: latestLC.loyalUsers, churnedU: latestLC.churnedUsers,
+    ncRatio, avgActions, topApp, topAppPct,
+    adoptionStage, habitStage, retentionHealth,
+    pb_active, pb_ph, pb_l3, pb_loyal,
+    healthScore, healthLabel, healthColor
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHART BUILDERS
+// ═══════════════════════════════════════════════════════════════════════════
+function renderTrends(rows){
+  const wkMap = {};
+  for (const r of rows){
+    if (!wkMap[r.dateMs]) wkMap[r.dateMs] = {iso:r.dateISO,total:0,prompts:0,active:new Set()};
+    wkMap[r.dateMs].total += r.total;
+    wkMap[r.dateMs].prompts += r.prompts;
+    if (r.total > 0) wkMap[r.dateMs].active.add(r.pid);
+  }
+  const wks = Object.values(wkMap).sort((a,b)=>a.iso.localeCompare(b.iso));
+  const dates = wks.map(w=>w.iso), acts = wks.map(w=>w.total),
+        proms = wks.map(w=>w.prompts), actU = wks.map(w=>w.active.size);
+  const data = [
+    {type:'scatter',x:dates,y:acts,name:'Total Copilot Actions',
+     line:{color:C.blue,width:3},fill:'tozeroy',fillcolor:'rgba(0,120,212,0.10)',
+     hovertemplate:'%{y:,.0f}<extra>Total Actions</extra>'},
+    {type:'scatter',x:dates,y:proms,name:'Chat Prompts',
+     line:{color:C.purple,width:2,dash:'dash'},
+     hovertemplate:'%{y:,.0f}<extra>Chat Prompts</extra>'},
+    {type:'scatter',x:dates,y:actU,name:'Active Users',
+     line:{color:C.orange,width:2},yaxis:'y2',
+     hovertemplate:'%{y:,}<extra>Active Users</extra>'}
+  ];
+  const layout = freshLayout({
+    hovermode:'x unified',
+    xaxis:freshAx({title:'Week'}),
+    yaxis:freshAx({title:'Actions / Prompts'}),
+    yaxis2:freshAx({title:'Active Users',overlaying:'y',side:'right'})
+  });
+  Plotly.react('chartTrends', data, layout, PC);
+}
+
+function renderAppBar(rows){
+  const hasApp = COL_MAP.excel || COL_MAP.outlook || COL_MAP.teams;
+  document.getElementById('appChartsSection').style.display = hasApp ? 'block' : 'none';
+  document.getElementById('appNoData').style.display = hasApp ? 'none' : 'block';
+  if (!hasApp) return;
+  const wkMap = {};
+  for (const r of rows){
+    if (!wkMap[r.dateMs]) wkMap[r.dateMs] = {iso:r.dateISO,excel:0,outlook:0,teams:0};
+    wkMap[r.dateMs].excel   += r.excel;
+    wkMap[r.dateMs].outlook += r.outlook;
+    wkMap[r.dateMs].teams   += r.teams;
+  }
+  const wks = Object.values(wkMap).sort((a,b)=>a.iso.localeCompare(b.iso));
+  const dates = wks.map(w=>w.iso);
+  const data = [
+    {type:'bar',x:dates,y:wks.map(w=>w.excel),name:'Excel',marker:{color:APP_COLORS.Excel},hovertemplate:'%{y:,.0f}<extra>Excel</extra>'},
+    {type:'bar',x:dates,y:wks.map(w=>w.outlook),name:'Outlook',marker:{color:APP_COLORS.Outlook},hovertemplate:'%{y:,.0f}<extra>Outlook</extra>'},
+    {type:'bar',x:dates,y:wks.map(w=>w.teams),name:'Teams Chat Summarise',marker:{color:APP_COLORS.Teams},hovertemplate:'%{y:,.0f}<extra>Teams</extra>'}
+  ];
+  Plotly.react('chartAppBar', data, freshLayout({barmode:'group',xaxis:freshAx(),yaxis:freshAx({title:'Actions'})}), PC);
+}
+
+function renderAppDonut(rows){
+  if (!COL_MAP.excel && !COL_MAP.outlook && !COL_MAP.teams) return;
+  const totals = {
+    Excel:   rows.reduce((s,r)=>s+r.excel,0),
+    Outlook: rows.reduce((s,r)=>s+r.outlook,0),
+    Teams:   rows.reduce((s,r)=>s+r.teams,0)
+  };
+  const labels = Object.keys(totals), values = Object.values(totals);
+  const colors = labels.map(l=>APP_COLORS[l]||C.blue);
+  const data = [{type:'pie',labels,values,marker:{colors},hole:0.52,textinfo:'label+percent',
+    hovertemplate:'%{label}: %{value:,.0f}<extra></extra>'}];
+  Plotly.react('chartAppDonut', data, freshLayout(), PC);
+}
+
+function renderHeatmap(rows){
+  const hmSection = document.getElementById('heatmapSection');
+  // Use the first attribute that is currently "All" (unfiltered)
+  const attrCol = ATTR_COLS.find(a => !ACTIVE_FILTERS[a] || ACTIVE_FILTERS[a] === 'All');
+  if (!attrCol){ hmSection.style.display='none'; return; }
+  hmSection.style.display = 'block';
+  document.getElementById('heatmapTitle').textContent =
+    `Average Weekly Copilot Actions per User — by ${attrCol} (Last 4 Weeks)`;
+  const weeks = unique(rows.map(r=>r.dateMs)).sort((a,b)=>a-b).slice(-4);
+  const rRows = rows.filter(r => weeks.includes(r.dateMs));
+  const matrix = {};
+  for (const r of rRows){
+    const v = r[attrCol] || '(blank)';
+    if (!matrix[v]) matrix[v] = {};
+    if (!matrix[v][r.dateMs]) matrix[v][r.dateMs] = [];
+    matrix[v][r.dateMs].push(r.total);
+  }
+  const attrs = Object.keys(matrix).sort((a,b)=>{
+    const sumA = weeks.reduce((s,w)=>s+(matrix[a][w]?matrix[a][w].reduce((x,y)=>x+y,0)/matrix[a][w].length:0),0);
+    const sumB = weeks.reduce((s,w)=>s+(matrix[b][w]?matrix[b][w].reduce((x,y)=>x+y,0)/matrix[b][w].length:0),0);
+    return sumA - sumB;
+  });
+  const xlabels = weeks.map(toLbl);
+  const z = attrs.map(a => weeks.map(w => {
+    const vals = matrix[a][w];
+    return vals ? Math.round(vals.reduce((s,v)=>s+v,0)/vals.length*10)/10 : 0;
+  }));
+  const layout = freshLayout({
+    margin:{l:180,r:20,t:40,b:60},
+    height:Math.max(360, attrs.length*22),
+    yaxis:{tickfont:{size:10},automargin:true}
+  });
+  Plotly.react('chartHeatmap',
+    [{type:'heatmap',z,x:xlabels,y:attrs,
+      colorscale:[[0,C.lblue],[0.5,C.blue],[1,C.dark]],
+      colorbar:{title:'Avg Actions'},
+      hovertemplate:`${attrCol}: %{y}<br>Week: %{x}<br>Avg: %{z:.1f}<extra></extra>`}],
+    layout, PC);
+}
+
+function renderLtierBar(rows){
+  // Build per-week, per-pid tier map
+  const wkMap = {};
+  for (const r of rows){
+    if (!wkMap[r.dateMs]) wkMap[r.dateMs] = {iso:r.dateISO,pids:{}};
+    wkMap[r.dateMs].pids[r.pid] = r.ltier;
+  }
+  // Sort ONCE and reuse — avoids NaN from unstable double-sort
+  const wks = Object.values(wkMap).sort((a,b)=>a.iso.localeCompare(b.iso));
+  const dates = wks.map(w=>w.iso);
+  const order = ['L3 Expert','L2 Intermediate','L1 Beginner','Inactive'];
+  const data = order.map(tier => {
+    const y = wks.map(w => Object.values(w.pids).filter(t=>t===tier).length);
+    return {type:'bar',x:dates,y,name:tier,marker:{color:LTIER_COLORS[tier]||C.g30},
+      hovertemplate:`%{y:,}<extra>${tier}</extra>`};
+  });
+  Plotly.react('chartLtierBar', data, freshLayout({barmode:'stack',xaxis:freshAx(),yaxis:freshAx({title:'Users'})}), PC);
+}
+
+function renderLtierDonut(rows){
+  const latest = rows.reduce((m,r)=>r.dateMs>m?r.dateMs:m, 0);
+  const dw = rows.filter(r=>r.dateMs===latest);
+  // Count unique pids per tier (last-seen tier wins per pid per week)
+  const pidTier = {};
+  for (const r of dw) pidTier[r.pid] = r.ltier;
+  const counts = {};
+  for (const t of Object.values(pidTier)) counts[t] = (counts[t]||0)+1;
+  const order = ['L3 Expert','L2 Intermediate','L1 Beginner','Inactive'];
+  const labels = order.filter(t=>counts[t]), values = labels.map(t=>counts[t]);
+  const colors = labels.map(t=>LTIER_COLORS[t]||C.g30);
+  Plotly.react('chartLtierDonut',
+    [{type:'pie',labels,values,marker:{colors},hole:0.52,textinfo:'label+percent',
+      hovertemplate:'%{label}: %{value:,}<extra></extra>'}],
+    freshLayout(), PC);
+}
+
+function renderLoyalty(rows){
+  const lc = loyaltyChurn(rows);
+  const dates = lc.map(w=>w.dateISO);
+  const data = [
+    {type:'scatter',x:dates,y:lc.map(w=>w.newUsers),name:'New Users',
+     stackgroup:'one',line:{color:C.green},
+     hovertemplate:'%{y:,}<extra>New Users</extra>'},
+    {type:'scatter',x:dates,y:lc.map(w=>w.loyalUsers),name:'Loyal Users',
+     stackgroup:'one',line:{color:C.blue},
+     hovertemplate:'%{y:,}<extra>Loyal Users</extra>'},
+    {type:'scatter',x:dates,y:lc.map(w=>w.churnedUsers),name:'Churned',
+     mode:'lines',line:{color:C.orange,width:2,dash:'dash'},
+     hovertemplate:'%{y:,}<extra>Churned</extra>'}
+  ];
+  Plotly.react('chartLoyalty', data, freshLayout({hovermode:'x unified',xaxis:freshAx(),yaxis:freshAx({title:'Users'})}), PC);
+}
+
+function renderSegBar(rows){
+  // Build per-week, per-pid segment map
+  const wkMap = {};
+  for (const r of rows){
+    if (!wkMap[r.dateMs]) wkMap[r.dateMs] = {iso:r.dateISO,pids:{}};
+    wkMap[r.dateMs].pids[r.pid] = r.usageSeg;
+  }
+  // Sort ONCE and reuse — avoids NaN from unstable double-sort
+  const wks = Object.values(wkMap).sort((a,b)=>a.iso.localeCompare(b.iso));
+  const dates = wks.map(w=>w.iso);
+  const order = ['Power User','Habitual User','Novice User','Low User','Non-user'];
+  const data = order.map(seg => {
+    const y = wks.map(w => Object.values(w.pids).filter(s=>s===seg).length);
+    return {type:'bar',x:dates,y,name:seg,marker:{color:SEG_COLORS[seg]||C.g30},
+      hovertemplate:`%{y:,}<extra>${seg}</extra>`};
+  });
+  Plotly.react('chartSegBar', data, freshLayout({barmode:'stack',xaxis:freshAx(),yaxis:freshAx({title:'Users'})}), PC);
+}
+
+function renderSegDonut(rows){
+  const latest = rows.reduce((m,r)=>r.dateMs>m?r.dateMs:m, 0);
+  const dw = rows.filter(r=>r.dateMs===latest);
+  // Count unique pids per segment (last-seen segment wins per pid per week)
+  const pidSeg = {};
+  for (const r of dw) pidSeg[r.pid] = r.usageSeg;
+  const counts = {};
+  for (const s of Object.values(pidSeg)) counts[s] = (counts[s]||0)+1;
+  const order = ['Power User','Habitual User','Novice User','Low User','Non-user'];
+  const labels = order.filter(t=>counts[t]), values = labels.map(t=>counts[t]);
+  const colors = labels.map(t=>SEG_COLORS[t]||C.g30);
+  Plotly.react('chartSegDonut',
+    [{type:'pie',labels,values,marker:{colors},hole:0.52,textinfo:'label+percent',
+      hovertemplate:'%{label}: %{value:,}<extra></extra>'}],
+    freshLayout(), PC);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HTML GENERATORS
+// ═══════════════════════════════════════════════════════════════════════════
+function kpiHTML(k){
+  return `
+    <div class="kpi-card">
+      <div class="kpi-lbl">Active Users</div>
+      <div class="kpi-val">${fmtNum(k.active)}</div>
+      <div class="kpi-sub">${k.pct}% of ${fmtNum(k.total)} licensed &nbsp;&middot;&nbsp; ${k.latestWeek}</div>
+    </div>
+    <div class="kpi-card p">
+      <div class="kpi-lbl">Total Copilot Actions</div>
+      <div class="kpi-val">${k.actions}</div>
+      <div class="kpi-sub">All actions in latest week</div>
+    </div>
+    <div class="kpi-card g">
+      <div class="kpi-lbl">Avg Actions / Active User</div>
+      <div class="kpi-val">${k.avgActions}</div>
+      <div class="kpi-sub">Per active user in latest week</div>
+    </div>
+    <div class="kpi-card t">
+      <div class="kpi-lbl">Copilot Chat Prompts</div>
+      <div class="kpi-val">${k.prompts}</div>
+      <div class="kpi-sub">Work prompts in latest week</div>
+    </div>`;
+}
+
+function alertHTML(ins){
+  const up = ins.trendDir === 'up';
+  const cls = up ? 'alert-green' : 'alert-yellow';
+  const ico = up ? '💡' : '⚠️';
+  const trendStr = up
+    ? `<span style="color:var(--green);font-weight:700">▲ +${Math.abs(ins.trendPct)}%</span>`
+    : `<span style="color:var(--red);font-weight:700">▼ ${ins.trendPct}%</span>`;
+  return `<div class="alert ${cls}">
+    <div class="alert-icon">${ico}</div>
+    <div class="alert-cnt">
+      <div class="alert-title">Adoption Health: ${ins.healthLabel} &nbsp;·&nbsp; Score ${ins.healthScore}/100</div>
+      Overall Copilot usage is ${trendStr} vs the first four weeks.
+      <strong>${fmtNum(ins.activeU)}</strong> users (${ins.pctAct}% of ${fmtNum(ins.totalU)} licensed)
+      active in the latest week — <em>${ins.adoptionStage}</em> classification.
+      <strong>${fmtNum(ins.phCount)}</strong> Power + Habitual users (${ins.pctPH}%);
+      ${ins.habitStage}. New-to-Churned ratio: <strong>${ins.ncRatio}</strong> — ${ins.retentionHealth}.
+    </div>
+  </div>`;
+}
+
+function overviewInsightsHTML(ins){
+  return `
+  <div class="ins-card">
+    <div class="ins-title">📈 Overall Adoption</div>
+    <div class="ins-body">
+      <ul>
+        <li><strong>${ins.pctAct}% active-user rate</strong> — ${ins.adoptionStage} classification
+          (Frontier Firms: ≥70%; Microsoft WTI 2024: 75% of knowledge workers use AI globally).</li>
+        <li>Adoption trending <strong>${ins.trendDir === 'up' ? '▲ +' : '▼ '}${Math.abs(ins.trendPct)}%</strong>
+          comparing first vs last 4-week average.</li>
+        <li>Average <strong>${ins.avgActions} actions per active user</strong> per week.
+          Power Users in Microsoft research save 30+ min/day through regular Copilot use.</li>
+      </ul>
+      <div class="ins-rec"><strong>Recommended Action</strong>
+        <ul>
+          <li>Set 70% active-user rate as the 90-day north-star target with weekly tracking.</li>
+          <li>Identify the top 10% by action volume — convert them into Copilot Champions.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ins-card ap">
+    <div class="ins-title">📱 App &amp; Usage Depth</div>
+    <div class="ins-body">
+      <ul>
+        <li><strong>${ins.topApp}</strong> leads app usage at <strong>${ins.topAppPct}%</strong> of tracked actions.
+          Concentrated use may limit discovery of Copilot in other apps.</li>
+        <li><strong>${ins.pctL3}%</strong> of users are L3 Experts (5+ active days/week) —
+          the group most likely to achieve compounding productivity gains.</li>
+        <li>Microsoft WTI: Copilot users edited 10% more documents in Word, Excel, and PowerPoint.
+          Multi-app adoption compounds these benefits.</li>
+      </ul>
+      <div class="ins-rec"><strong>Recommended Action</strong>
+        <ul>
+          <li>Host app-specific "Copilot in a Day" sessions for apps beyond ${ins.topApp}.</li>
+          <li>Target 25%+ L3 Expert share within two quarters.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ins-card ag">
+    <div class="ins-title">⚡ Power &amp; Habitual Users</div>
+    <div class="ins-body">
+      <ul>
+        <li><strong>${fmtNum(ins.powerCount)}</strong> Power Users and <strong>${fmtNum(ins.habitualCount)}</strong>
+          Habitual Users (12-week rolling vivainsights methodology).</li>
+        <li>Combined share: <strong>${ins.pctPH}%</strong> — ${ins.habitStage} (Frontier Firm target: 20%+).</li>
+        <li>Power users are 68% more likely to experiment with AI and
+          66% more likely to redesign business processes. <em>(Source: Work Trend Index)</em></li>
+      </ul>
+      <div class="ins-rec"><strong>Recommended Action</strong>
+        <ul>
+          <li>Nominate Power Users as AI Champions with peer coaching responsibilities.</li>
+          <li>Launch a 30-day "Habit Builder" programme for Novice users.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ins-card at">
+    <div class="ins-title">🔄 Loyalty &amp; Retention</div>
+    <div class="ins-body">
+      <ul>
+        <li>New-to-Churned ratio: <strong>${ins.ncRatio}</strong> — <strong>${ins.retentionHealth}</strong>
+          (Growing ≥1.2, Stable 0.8–1.2, At-Risk &lt;0.8).</li>
+        <li><strong>${fmtNum(ins.loyalU)}</strong> Loyal Users &amp; <strong>${fmtNum(ins.churnedU)}</strong>
+          Churned Users in the latest week (4-week lookback).</li>
+        <li>Returning users generate 2–3× more actions than first-time users — retention has outsized impact.</li>
+      </ul>
+      <div class="ins-rec"><strong>Recommended Action</strong>
+        <ul>
+          <li>Survey churned users within 2 weeks to identify top friction points.</li>
+          <li>Deploy Viva Insights nudges for users inactive 2+ consecutive weeks.</li>
+        </ul>
+      </div>
+    </div>
+  </div>`;
+}
+
+function insightsTabHTML(ins){
+  const stCls = ins.adoptionStage==='Frontier Firm'?'badge-green':ins.adoptionStage==='Developing'?'badge-blue':'badge-yellow';
+  const phSt  = ins.pctPH>=20?'badge-green':ins.pctPH>=10?'badge-blue':'badge-yellow';
+  const phLbl = ins.pctPH>=20?'✓ On Track':ins.pctPH>=10?'Developing':'Needs Focus';
+  const l3St  = ins.pctL3>=25?'badge-green':ins.pctL3>=12?'badge-blue':'badge-yellow';
+  const l3Lbl = ins.pctL3>=25?'✓ On Track':ins.pctL3>=12?'Developing':'Needs Focus';
+  const acSt  = ins.pctAct>=70?'badge-green':ins.pctAct>=50?'badge-blue':'badge-yellow';
+  const acLbl = ins.pctAct>=70?'✓ On Track':ins.pctAct>=50?'Developing':'Needs Focus';
+  const ncSt  = ins.ncRatio>=1.2?'badge-green':ins.ncRatio>=0.8?'badge-blue':'badge-red';
+  const avSt  = ins.avgActions>=15?'badge-green':ins.avgActions>=8?'badge-blue':'badge-yellow';
+  const avLbl = ins.avgActions>=15?'✓ On Track':ins.avgActions>=8?'Developing':'Needs Focus';
+  const healthDesc = ins.healthScore>=75
+    ? 'Strong performance reflecting embedded AI workflows and meaningful productivity uplift.'
+    : ins.healthScore>=50
+    ? 'Good momentum with clear opportunities to deepen habitual usage and close the churn gap.'
+    : 'Early-stage — prioritise awareness, structured training, and friction removal to advance.';
+  const churnMsg = ins.retentionHealth==='Growing'
+    ? 'The base is growing — convert new users into loyal ones within their first 4 weeks through structured onboarding.'
+    : ins.retentionHealth==='Stable'
+    ? 'Acquisition and churn are broadly balanced. Focus on deepening loyalty to build a compounding effect.'
+    : 'Churn is offsetting new user gains. Survey lapsed users immediately and deploy quick-win fixes.';
+
+  return `
+  <div class="health-box">
+    <div class="health-circle" style="background:${ins.healthColor}">
+      <div class="score">${ins.healthScore}</div><div class="lbl">/ 100</div>
+    </div>
+    <div class="health-detail">
+      <h3>Adoption Health Score &nbsp;<span class="badge ${stCls}">${ins.adoptionStage}</span></h3>
+      <p>Composite of active-user rate (30%), Power+Habitual share (30%), L3 Expert share (20%),
+         and retention ratio (20%). Score: <strong>${ins.healthScore}</strong> — <strong>${ins.healthLabel}</strong>. ${healthDesc}</p>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:20px">
+    <h3>KPI Progress vs Frontier Firm Benchmarks</h3>
+    <div style="padding:8px 0">
+      <div class="prog-group">
+        <div class="prog-lbl"><span>Active User Rate (${ins.pctAct}%)</span><span>Target: 70%</span></div>
+        <div class="prog-bg"><div class="prog-bar bar-blue" id="pb1" style="width:0%"></div></div>
+      </div>
+      <div class="prog-group">
+        <div class="prog-lbl"><span>Power + Habitual Users (${ins.pctPH}%)</span><span>Target: 20%</span></div>
+        <div class="prog-bg"><div class="prog-bar bar-purple" id="pb2" style="width:0%"></div></div>
+      </div>
+      <div class="prog-group">
+        <div class="prog-lbl"><span>L3 Expert Users (${ins.pctL3}%)</span><span>Target: 25%</span></div>
+        <div class="prog-bg"><div class="prog-bar bar-teal" id="pb3" style="width:0%"></div></div>
+      </div>
+      <div class="prog-group">
+        <div class="prog-lbl"><span>Loyal User Retention</span><span>Target: 60%+ of active</span></div>
+        <div class="prog-bg"><div class="prog-bar bar-green" id="pb4" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bench-table" style="margin-bottom:22px">
+    <table>
+      <thead><tr><th>Metric</th><th>This Cohort</th><th>Frontier Firm Target</th><th>Benchmark Source</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Active User Rate</strong></td><td>${ins.pctAct}%</td><td>≥ 70%</td>
+          <td>Microsoft WTI 2024: 75% of global knowledge workers use AI</td>
+          <td><span class="badge ${acSt}">${acLbl}</span></td></tr>
+        <tr><td><strong>Power + Habitual Users</strong></td><td>${ins.pctPH}%</td><td>≥ 20%</td>
+          <td>vivainsights identify_usage_segments · Frontier Firm definition</td>
+          <td><span class="badge ${phSt}">${phLbl}</span></td></tr>
+        <tr><td><strong>L3 Expert Share</strong></td><td>${ins.pctL3}%</td><td>≥ 25%</td>
+          <td>5+ active days/wk signals embedded workflow usage</td>
+          <td><span class="badge ${l3St}">${l3Lbl}</span></td></tr>
+        <tr><td><strong>New-to-Churned Ratio</strong></td><td>${ins.ncRatio}</td><td>≥ 1.2 (Growing)</td>
+          <td>4-week retention lookback · Stable = 0.8–1.2</td>
+          <td><span class="badge ${ncSt}">${ins.retentionHealth}</span></td></tr>
+        <tr><td><strong>Avg Actions / Active User / Week</strong></td><td>${ins.avgActions}</td><td>≥ 15</td>
+          <td>Microsoft WTI: Power users save 30+ min/day</td>
+          <td><span class="badge ${avSt}">${avLbl}</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rec-section">
+    <h3>🎯 Strategic Recommendations</h3>
+    <div class="rec-item">
+      <span class="pri-tag pri-hi">High Priority</span>
+      <h4>Activate an AI Champions Network</h4>
+      <p>Your <strong>${fmtNum(ins.powerCount)} Power Users</strong> are your most valuable adoption asset.
+         Formalise their role with peer coaching responsibilities, leadership visibility, and early access to new features.
+         Microsoft WTI: Power users are 61% more likely to hear from their CEO about AI — leadership endorsement
+         is the strongest predictor of broader adoption lift.</p>
+    </div>
+    <div class="rec-item" style="border-left-color:var(--purple)">
+      <span class="pri-tag pri-hi">High Priority</span>
+      <h4>Close the Habit Gap with a 30-Day Structured Programme</h4>
+      <p>At <strong>${ins.pctPH}%</strong> Power + Habitual users (target: 20%), deploy a 4-week prompting challenge
+         for Novice users: one workflow-relevant use case per week
+         (Teams meeting recap → Outlook email drafting → Excel data analysis → Word document drafting).
+         Users need to be active in ≥9 of 12 weeks to reach Habitual status.</p>
+    </div>
+    <div class="rec-item" style="border-left-color:var(--green)">
+      <span class="pri-tag pri-med">Medium Priority</span>
+      <h4>Address Churn &amp; Deepen Loyalty</h4>
+      <p>${churnMsg} Returning Copilot users generate 2–3× more actions than first-time users,
+         making retention a higher-ROI lever than new acquisition.
+         Implement Viva Insights nudges for users inactive ≥2 consecutive weeks.</p>
+    </div>
+    <div class="rec-item" style="border-left-color:var(--teal)">
+      <span class="pri-tag pri-med">Medium Priority</span>
+      <h4>Grow Multi-App Copilot Adoption Beyond ${ins.topApp}</h4>
+      <p><strong>${ins.topApp}</strong> accounts for <strong>${ins.topAppPct}%</strong> of all tracked app actions.
+         Unlocking Copilot across Outlook, Teams, and Word compounds time savings significantly.
+         Microsoft WTI: Copilot users read 11% fewer emails and edited 10% more documents —
+         gains that only materialise with multi-app adoption.</p>
+    </div>
+    <div class="rec-item" style="border-left-color:var(--orange)">
+      <span class="pri-tag pri-lo">Ongoing</span>
+      <h4>Measure Impact, Not Just Activity</h4>
+      <p>Pair this dashboard with a quarterly Copilot impact survey capturing time saved per task
+         and quality improvements. Microsoft estimates: Power Users save 30+ min/day; the top 5%
+         of Teams users summarised 8 hours of meetings in a single month — equivalent to a full
+         workday reclaimed. Report outcomes at leadership level to sustain executive sponsorship.</p>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+function renderActive(){
+  const rows = getFilteredRows();
+  if (rows.length === 0){
+    // Show no-data state for current tab
+    return;
+  }
+  const tab = document.querySelector('.tab-item.active')?.dataset.tab || 'overview';
+  if (tab === 'overview'){
+    const k = buildKpis(rows);
+    const ins = buildInsights(rows);
+    document.getElementById('kpiRow').innerHTML = kpiHTML(k);
+    document.getElementById('overviewAlert').innerHTML = alertHTML(ins);
+    document.getElementById('overviewInsights').innerHTML = overviewInsightsHTML(ins);
+  } else if (tab === 'trends'){
+    renderTrends(rows);
+  } else if (tab === 'apps'){
+    renderAppBar(rows);
+    renderAppDonut(rows);
+    renderHeatmap(rows);
+  } else if (tab === 'segments'){
+    renderLtierBar(rows);
+    renderLtierDonut(rows);
+  } else if (tab === 'loyalty'){
+    renderLoyalty(rows);
+  } else if (tab === 'power'){
+    renderSegBar(rows);
+    renderSegDonut(rows);
+  } else if (tab === 'insights'){
+    const ins = buildInsights(rows);
+    document.getElementById('insightsContent').innerHTML = insightsTabHTML(ins);
+    setTimeout(() => {
+      const set = (id,val) => { const el=document.getElementById(id); if(el) el.style.width=val+'%'; };
+      set('pb1', ins.pb_active); set('pb2', ins.pb_ph);
+      set('pb3', ins.pb_l3);     set('pb4', ins.pb_loyal);
+    }, 60);
+  }
+  // After rendering, resize all Plotly charts in the now-visible tab so they
+  // pick up the correct container dimensions (Plotly can't measure display:none divs).
+  setTimeout(() => {
+    const tabEl = document.getElementById('tab-'+tab);
+    if (tabEl) {
+      tabEl.querySelectorAll('.js-plotly-plot').forEach(el => {
+        try { Plotly.Plots.resize(el); } catch(e){}
+      });
+    }
+    window.dispatchEvent(new Event('resize'));
+  }, 80);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UI MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════
+function showPage(id){
+  ['page-landing','page-summary','page-loading','page-dashboard'].forEach(p => {
+    const el = document.getElementById(p);
+    el.style.display = 'none';
+    el.style.flexDirection = '';
+  });
+  const target = document.getElementById(id);
+  if (id === 'page-landing' || id === 'page-summary'){
+    target.style.display = 'flex';
+    target.style.flexDirection = 'column';
+  } else if (id === 'page-loading'){
+    target.style.display = 'flex';
+  } else {
+    target.style.display = 'flex';
+    target.style.flexDirection = 'column';
+  }
+}
+
+function goToLanding(){
+  ENRICHED_ROWS = []; COL_MAP = {}; ATTR_COLS = [];
+  ATTR_VALUES = {}; ACTIVE_FILTERS = {}; RAW_CSV_ROWS = [];
+  document.getElementById('fileInput').value = '';
+  showPage('page-landing');
+}
+
+function setLoadingStep(n){
+  for (let i=1; i<=6; i++){
+    const el = document.getElementById('ls'+i);
+    if (i < n)       { el.className='loading-step done'; el.textContent='✓ '+el.textContent.replace(/^[✓⏳▶] /,''); }
+    else if (i === n){ el.className='loading-step active'; el.textContent='▶ '+el.textContent.replace(/^[✓⏳▶] /,''); }
+    else             { el.className='loading-step'; }
+  }
+}
+
+function buildFilterStrip(){
+  const strip = document.getElementById('filterStrip');
+  if (ATTR_COLS.length === 0){ strip.innerHTML='<span style="font-size:13px;color:var(--g90);padding:10px 28px;display:block">No attribute filters detected in this CSV.</span>'; return; }
+  let html = `<div class="filter-header">`;
+  html += `<button class="filter-toggle" id="filterToggle" onclick="toggleFilters()"><span class="arrow">▼</span> Filters (${ATTR_COLS.length} attributes)</button>`;
+  html += `<button class="btn-clear-filters" onclick="clearFilters()">Clear Filters</button>`;
+  html += `<span class="filter-active-count" id="activeFilterCount"></span>`;
+  html += `</div>`;
+  html += `<div class="filter-body" id="filterBody">`;
+  for (const a of ATTR_COLS){
+    const vals = ATTR_VALUES[a] || [];
+    html += `<select class="filter-select" onchange="onFilterChange('${a.replace(/'/g,"\\'")}',this.value)">`;
+    html += `<option value="All">${a}: All (${vals.length})</option>`;
+    for (const v of vals) html += `<option value="${v}">${v}</option>`;
+    html += `</select>`;
+  }
+  html += `</div>`;
+  strip.innerHTML = html;
+}
+
+function toggleFilters(){
+  const body = document.getElementById('filterBody');
+  const btn = document.getElementById('filterToggle');
+  body.classList.toggle('expanded');
+  btn.classList.toggle('open');
+}
+
+function onFilterChange(col, val){
+  ACTIVE_FILTERS[col] = val;
+  const cnt = activeFilterCount();
+  const el = document.getElementById('activeFilterCount');
+  if (el) el.textContent = cnt > 0 ? `${cnt} active filter${cnt>1?'s':''}` : '';
+  renderActive();
+}
+
+function clearFilters(){
+  for (const a of ATTR_COLS) ACTIVE_FILTERS[a] = 'All';
+  document.querySelectorAll('#filterStrip .filter-select').forEach(s => s.selectedIndex=0);
+  const el = document.getElementById('activeFilterCount');
+  if (el) el.textContent = '';
+  renderActive();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SUMMARY PAGE RENDERING
+// ═══════════════════════════════════════════════════════════════════════════
+function renderSummaryPage(rawRows, headers){
+  ALL_HEADERS = headers;
+  RAW_CSV_ROWS = rawRows;
+  const det = detectColumns(headers, rawRows);
+  COL_MAP = det.colMap;
+  ATTR_COLS = det.attrCols;
+
+  // Sample data for meta stats
+  const SAMPLE_COL_MAP = Object.assign({},COL_MAP);
+  const sampleRows = rawRows.slice(0,Math.min(rawRows.length,100));
+  const totalRows = rawRows.length;
+
+  // Unique users & dates from full data
+  const pids = new Set(), dates = new Set();
+  for (const r of rawRows){
+    if (r[SAMPLE_COL_MAP.pid]) pids.add(String(r[SAMPLE_COL_MAP.pid]).trim());
+    if (r[SAMPLE_COL_MAP.date]){
+      const ms = parseDate(r[SAMPLE_COL_MAP.date]);
+      if (ms) dates.add(ms);
+    }
+  }
+  const sortedDates = [...dates].sort((a,b)=>a-b);
+  document.getElementById('metaRows').textContent = fmtNum(totalRows);
+  document.getElementById('metaUsers').textContent = fmtNum(pids.size);
+  document.getElementById('metaWeeks').textContent = sortedDates.length;
+  if (sortedDates.length >= 2){
+    const fmt = ms => new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    document.getElementById('metaDates').textContent = fmt(sortedDates[0])+'–'+fmt(sortedDates[sortedDates.length-1]);
+  } else {
+    document.getElementById('metaDates').textContent = sortedDates.length > 0 ? toISO(sortedDates[0]) : '—';
+  }
+
+  // Column mapping table
+  const ROLES = [
+    {key:'pid',    label:'User ID',           req:true},
+    {key:'date',   label:'Week Date',          req:true},
+    {key:'total',  label:'Total Copilot Actions', req:true},
+    {key:'active', label:'Active Days',        req:true},
+    {key:'prompts',label:'Chat Prompts',       req:false},
+    {key:'excel',  label:'Excel Actions',      req:false},
+    {key:'outlook',label:'Outlook Actions',    req:false},
+    {key:'teams',  label:'Teams (Summarize)',  req:false},
+  ];
+  let tbl = '';
+  for (const r of ROLES){
+    const detected = COL_MAP[r.key];
+    const status = detected
+      ? `<span class="status-ok">✓ Detected</span>`
+      : r.req ? `<span class="status-miss">⚠ Not found</span>` : `<span style="color:var(--g90)">— Optional</span>`;
+    // Override dropdown
+    let dd = `<select class="filter-select" style="min-width:200px" onchange="overrideCol('${r.key}',this.value)">`;
+    dd += `<option value="">— Not available —</option>`;
+    for (const h of headers){
+      dd += `<option value="${h}" ${h===detected?'selected':''}>${h}</option>`;
+    }
+    dd += `</select>`;
+    tbl += `<tr><td><strong>${r.label}</strong>${r.req?'<span style="color:var(--red)"> *</span>':''}</td>
+              <td style="font-family:monospace;font-size:12px;color:var(--dark)">${detected||'—'}</td>
+              <td>${dd}</td><td>${status}</td></tr>`;
+  }
+  document.getElementById('colMapBody').innerHTML = tbl;
+
+  // Attribute chips
+  if (ATTR_COLS.length > 0){
+    // Build values for each attr
+    for (const a of ATTR_COLS){
+      const vals = unique(rawRows.map(r=>String(r[a]||'').trim())).sort();
+      ATTR_VALUES[a] = vals;
+    }
+    const chips = ATTR_COLS.map(a =>
+      `<div class="attr-chip">${a} <span class="count">${ATTR_VALUES[a].length} values</span></div>`
+    ).join('');
+    document.getElementById('attrChips').innerHTML = chips;
+    document.getElementById('attrChips').style.display = 'flex';
+    document.getElementById('noAttrMsg').style.display = 'none';
+  } else {
+    document.getElementById('attrChips').style.display = 'none';
+    document.getElementById('noAttrMsg').style.display = 'block';
+  }
+
+  // Check required columns
+  const missing = ROLES.filter(r=>r.req && !COL_MAP[r.key]).map(r=>r.label);
+  const errEl = document.getElementById('summaryErrBanner');
+  if (missing.length > 0){
+    errEl.style.display = 'block';
+    errEl.textContent = `⚠ Required columns not detected: ${missing.join(', ')}. Please use the Override dropdowns to map them manually.`;
+    document.getElementById('btnAnalyze').disabled = true;
+  } else {
+    errEl.style.display = 'none';
+    document.getElementById('btnAnalyze').disabled = false;
+  }
+
+  showPage('page-summary');
+}
+
+function overrideCol(key, val){
+  COL_MAP[key] = val || null;
+  // Re-check required columns
+  const required = ['pid','date','total','active'];
+  const missing = required.filter(k => !COL_MAP[k]);
+  const errEl = document.getElementById('summaryErrBanner');
+  if (missing.length > 0){
+    errEl.style.display='block';
+    errEl.textContent=`⚠ Required columns still missing: ${missing.join(', ')}. Please map them using the Override dropdowns.`;
+    document.getElementById('btnAnalyze').disabled=true;
+  } else {
+    errEl.style.display='none';
+    document.getElementById('btnAnalyze').disabled=false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ANALYSIS EXECUTION
+// ═══════════════════════════════════════════════════════════════════════════
+function startAnalysis(){
+  const required = ['pid','date','total','active'];
+  const missing = required.filter(k => !COL_MAP[k]);
+  if (missing.length > 0){ alert('Please map all required columns before proceeding.'); return; }
+
+  showPage('page-loading');
+
+  // Reset loading steps
+  for (let i=1; i<=6; i++){
+    const el = document.getElementById('ls'+i);
+    el.className='loading-step';
+    const label = ['Parsing CSV rows…','Computing proficiency tiers…',
+      'Computing 12-week usage segments…','Computing loyalty & churn…',
+      'Building insights & recommendations…','Preparing dashboard…'][i-1];
+    el.textContent = '⏳ '+label;
+  }
+
+  // Use setTimeout chain to allow UI to update between steps
+  setTimeout(() => {
+    setLoadingStep(1);
+    setTimeout(() => {
+      // Step 1: Re-detect attr cols with final COL_MAP
+      // Rebuild ATTR_COLS & ATTR_VALUES based on potentially overridden COL_MAP
+      const metricSet = new Set(Object.values(COL_MAP).filter(Boolean));
+      ATTR_COLS = ATTR_COLS.filter(a => !metricSet.has(a));
+      for (const a of ATTR_COLS){
+        const vals = unique(RAW_CSV_ROWS.map(r=>String(r[a]||'').trim())).sort();
+        ATTR_VALUES[a] = vals;
+        ACTIVE_FILTERS[a] = 'All';
+      }
+      setLoadingStep(2);
+      setTimeout(() => {
+        setLoadingStep(3);
+        setTimeout(() => {
+          try {
+            ENRICHED_ROWS = parseAndEnrich(RAW_CSV_ROWS, COL_MAP);
+          } catch(e){
+            alert('Error processing data: '+e.message); goToLanding(); return;
+          }
+          setLoadingStep(4);
+          setTimeout(() => {
+            setLoadingStep(5);
+            setTimeout(() => {
+              setLoadingStep(6);
+              setTimeout(() => {
+                // Build dashboard header subtitle
+                const weeks = unique(ENRICHED_ROWS.map(r=>r.dateMs)).sort((a,b)=>a-b);
+                const users = new Set(ENRICHED_ROWS.map(r=>r.pid)).size;
+                const fmt = ms => new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+                const dateRange = weeks.length>=2 ? `${fmt(weeks[0])} – ${fmt(weeks[weeks.length-1])}` : '';
+                const attrInfo = ATTR_COLS.length > 0
+                  ? ` · ${ATTR_COLS.length} attribute filter${ATTR_COLS.length>1?'s':''} detected`
+                  : '';
+                document.getElementById('dashSubtitle').textContent =
+                  `Viva Insights Person Query · ${dateRange} · ${fmtNum(users)} Users${attrInfo}`;
+                buildFilterStrip();
+                // Set up tab listeners
+                document.querySelectorAll('.tab-item').forEach(t => {
+                  t.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-item').forEach(x=>x.classList.remove('active'));
+                    document.querySelectorAll('.dash-page').forEach(x=>x.classList.remove('active'));
+                    t.classList.add('active');
+                    document.getElementById('tab-'+t.dataset.tab).classList.add('active');
+                    renderActive();
+                  });
+                });
+                showPage('page-dashboard');
+                renderActive();
+              }, 200);
+            }, 300);
+          }, 300);
+        }, 400);
+      }, 100);
+    }, 100);
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FILE UPLOAD HANDLING
+// ═══════════════════════════════════════════════════════════════════════════
+function handleFile(file){
+  if (!file) return;
+  if (!file.name.match(/\.(csv|txt)$/i) && file.type && !file.type.match(/text|csv/i)){
+    alert('Please upload a CSV file.'); return;
+  }
+  showPage('page-loading');
+  for (let i=1;i<=6;i++){
+    const el=document.getElementById('ls'+i);
+    el.className='loading-step';
+    el.textContent='⏳ '+['Parsing CSV rows…','Computing proficiency tiers…','Computing 12-week usage segments…','Computing loyalty & churn…','Building insights & recommendations…','Preparing dashboard…'][i-1];
+  }
+  setLoadingStep(1);
+  Papa.parse(file, {
+    header: true, skipEmptyLines: true,
+    complete: function(results){
+      if (results.errors && results.errors.length > 0 && results.data.length === 0){
+        alert('Could not parse CSV: '+results.errors[0].message);
+        goToLanding(); return;
+      }
+      if (!results.data || results.data.length === 0){
+        alert('The CSV appears to be empty.'); goToLanding(); return;
+      }
+      const headers = results.meta.fields || Object.keys(results.data[0]);
+      renderSummaryPage(results.data, headers);
+    },
+    error: function(err){ alert('Error reading file: '+err.message); goToLanding(); }
+  });
+}
+
+// ─── Upload zone events ───────────────────────────────────────────────────
+const zone = document.getElementById('uploadZone');
+const fInput = document.getElementById('fileInput');
+
+zone.addEventListener('click', () => fInput.click());
+fInput.addEventListener('change', e => handleFile(e.target.files?.[0]));
+
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', e => { if(!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over'); });
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag-over');
+  handleFile(e.dataTransfer.files?.[0]);
+});
+
+// ─── Initial state ────────────────────────────────────────────────────────
+showPage('page-landing');
+</script>
+</body>
+</html>
