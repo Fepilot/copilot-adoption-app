@@ -28,8 +28,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--g10);color:var
 .brand .sub{font-size:11px;opacity:0.75;margin-top:1px}
 .btn-ghost{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
   color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;
-  font-family:inherit;transition:0.2s;backdrop-filter:blur(4px)}
+  font-family:inherit;transition:0.2s;backdrop-filter:blur(4px);text-decoration:none}
 .btn-ghost:hover{background:rgba(255,255,255,0.25)}
+
+/* ── LANGUAGE SWITCH ── */
+.lang-switch{display:flex;gap:4px;align-items:center}
+.lang-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);
+  color:rgba(255,255,255,0.75);padding:5px 10px;border-radius:6px;cursor:pointer;
+  font-size:12px;font-weight:600;font-family:inherit;transition:0.2s}
+.lang-btn.active{background:rgba(255,255,255,0.95);color:var(--dark);border-color:transparent}
+.lang-btn:hover:not(.active){background:rgba(255,255,255,0.25);color:#fff}
 
 /* ── LANDING PAGE ── */
 #page-landing{min-height:100vh;display:flex;flex-direction:column}
@@ -301,39 +309,43 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
         <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
       </svg>
       <div>
-        <h1>Microsoft 365 Copilot Adoption Dashboard</h1>
-        <div class="sub">Powered by Viva Insights &nbsp;&middot;&nbsp; Client-side &nbsp;&middot;&nbsp; No data leaves your browser</div>
+        <h1 data-i18n="app.title">Microsoft 365 Copilot Adoption Dashboard</h1>
+        <div class="sub" data-i18n="app.sub">Powered by Viva Insights &nbsp;&middot;&nbsp; Client-side &nbsp;&middot;&nbsp; No data leaves your browser</div>
       </div>
+    </div>
+    <div class="lang-switch">
+      <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">EN</button>
+      <button class="lang-btn" data-lang="es" onclick="switchLang('es')">ES</button>
     </div>
   </header>
 
   <div class="landing-hero">
-    <h2 class="hero-title">Instant <span>Copilot Analytics</span><br>from your Viva Insights export</h2>
-    <p class="hero-sub">Upload your Person Query CSV and get a fully interactive, Microsoft-branded adoption dashboard &mdash; with Frontier Firm benchmarks, insights, and recommendations &mdash; in seconds.</p>
+    <h2 class="hero-title" data-i18n="hero.title">Instant <span>Copilot Analytics</span><br>from your Viva Insights export</h2>
+    <p class="hero-sub" data-i18n="hero.sub">Upload your Person Query CSV and get a fully interactive, Microsoft-branded adoption dashboard &mdash; with Frontier Firm benchmarks, insights, and recommendations &mdash; in seconds.</p>
 
     <div class="upload-zone" id="uploadZone">
       <div class="upload-icon">📊</div>
-      <div class="upload-main-text">Drag &amp; drop your CSV here</div>
-      <div class="upload-sub-text">or click to browse files</div>
-      <span class="upload-badge">Viva Insights Person Query export</span>
+      <div class="upload-main-text" data-i18n="upload.main" data-i18n-attr="text">Drag &amp; drop your CSV here</div>
+      <div class="upload-sub-text" data-i18n="upload.sub" data-i18n-attr="text">or click to browse files</div>
+      <span class="upload-badge" data-i18n="upload.badge" data-i18n-attr="text">Viva Insights Person Query export</span>
       <input type="file" id="fileInput" accept=".csv,text/csv"/>
     </div>
 
-    <p class="privacy-note">All analysis runs locally in your browser. No data is uploaded to any server.</p>
+    <p class="privacy-note" data-i18n="privacy" data-i18n-attr="text">All analysis runs locally in your browser. No data is uploaded to any server.</p>
 
     <div class="feature-grid">
-      <div class="feature-pill"><span class="icon">📈</span>7-Tab Interactive Dashboard</div>
-      <div class="feature-pill"><span class="icon">🏢</span>Auto-Detected Attribute Filters</div>
-      <div class="feature-pill"><span class="icon">🚀</span>Frontier Firm Benchmarks</div>
-      <div class="feature-pill"><span class="icon">🧠</span>Insights &amp; Recommendations</div>
-      <div class="feature-pill"><span class="icon">🔒</span>100% Client-Side Processing</div>
-      <div class="feature-pill"><span class="icon">⚡</span>No Code, No Install Required</div>
+      <div class="feature-pill"><span class="icon">📈</span><span data-i18n="feat.7tab" data-i18n-attr="text">7-Tab Interactive Dashboard</span></div>
+      <div class="feature-pill"><span class="icon">🏢</span><span data-i18n="feat.filters" data-i18n-attr="text">Auto-Detected Attribute Filters</span></div>
+      <div class="feature-pill"><span class="icon">🚀</span><span data-i18n="feat.bench" data-i18n-attr="text">Frontier Firm Benchmarks</span></div>
+      <div class="feature-pill"><span class="icon">🧠</span><span data-i18n="feat.insights" data-i18n-attr="text">Insights &amp; Recommendations</span></div>
+      <div class="feature-pill"><span class="icon">🔒</span><span data-i18n="feat.client" data-i18n-attr="text">100% Client-Side Processing</span></div>
+      <div class="feature-pill"><span class="icon">⚡</span><span data-i18n="feat.nocode" data-i18n-attr="text">No Code, No Install Required</span></div>
     </div>
 
     <div class="col-ref-card">
-      <h3>What columns does the CSV need?</h3>
+      <h3 data-i18n="col.title" data-i18n-attr="text">What columns does the CSV need?</h3>
       <div class="col-group">
-        <h4>Required (the dashboard won't run without these)</h4>
+        <h4 data-i18n="col.required" data-i18n-attr="text">Required (the dashboard won't run without these)</h4>
         <div class="col-chips">
           <span class="col-chip chip-req">PersonId</span>
           <span class="col-chip chip-req">MetricDate</span>
@@ -342,7 +354,7 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
         </div>
       </div>
       <div class="col-group">
-        <h4>Optional (enables richer charts)</h4>
+        <h4 data-i18n="col.optional" data-i18n-attr="text">Optional (enables richer charts)</h4>
         <div class="col-chips">
           <span class="col-chip chip-opt">Copilot chat (work) prompts submitted</span>
           <span class="col-chip chip-opt">Copilot actions taken in Excel</span>
@@ -351,7 +363,7 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
         </div>
       </div>
       <div class="col-group">
-        <h4>Auto-detected as filters (any string column with &le; 200 unique values)</h4>
+        <h4 data-i18n="col.auto" data-i18n-attr="text">Auto-detected as filters (any string column with &le; 200 unique values)</h4>
         <div class="col-chips">
           <span class="col-chip chip-auto">Organization</span>
           <span class="col-chip chip-auto">Country</span>
@@ -379,39 +391,39 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
         <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
       </svg>
       <div>
-        <h1>Microsoft 365 Copilot Adoption Dashboard</h1>
-        <div class="sub">CSV loaded &mdash; review and confirm before analysis</div>
+        <h1 data-i18n="app.title" data-i18n-attr="text">Microsoft 365 Copilot Adoption Dashboard</h1>
+        <div class="sub" data-i18n="summary.sub" data-i18n-attr="text">CSV loaded &mdash; review and confirm before analysis</div>
       </div>
     </div>
   </header>
   <div class="summary-wrap">
-    <h2 class="summary-title">✓ CSV Loaded Successfully</h2>
-    <p class="summary-sub">Review what was detected in your file, then click <strong>Analyze Dashboard</strong> to proceed.</p>
+    <h2 class="summary-title" data-i18n="summary.title" data-i18n-attr="text">✓ CSV Loaded Successfully</h2>
+    <p class="summary-sub" data-i18n="summary.desc">Review what was detected in your file, then click <strong>Analyze Dashboard</strong> to proceed.</p>
 
     <div id="summaryErrBanner" class="err-banner"></div>
 
     <div class="meta-cards">
-      <div class="meta-card"><div class="meta-label">Total Rows</div><div class="meta-value" id="metaRows">—</div></div>
-      <div class="meta-card" style="border-top-color:var(--purple)"><div class="meta-label">Unique Users</div><div class="meta-value" id="metaUsers">—</div></div>
-      <div class="meta-card" style="border-top-color:var(--green)"><div class="meta-label">Weeks</div><div class="meta-value" id="metaWeeks">—</div></div>
-      <div class="meta-card" style="border-top-color:var(--teal)"><div class="meta-label">Date Range</div><div class="meta-value" id="metaDates" style="font-size:14px;margin-top:6px">—</div></div>
+      <div class="meta-card"><div class="meta-label" data-i18n="meta.rows" data-i18n-attr="text">Total Rows</div><div class="meta-value" id="metaRows">—</div></div>
+      <div class="meta-card" style="border-top-color:var(--purple)"><div class="meta-label" data-i18n="meta.users" data-i18n-attr="text">Unique Users</div><div class="meta-value" id="metaUsers">—</div></div>
+      <div class="meta-card" style="border-top-color:var(--green)"><div class="meta-label" data-i18n="meta.weeks" data-i18n-attr="text">Weeks</div><div class="meta-value" id="metaWeeks">—</div></div>
+      <div class="meta-card" style="border-top-color:var(--teal)"><div class="meta-label" data-i18n="meta.dates" data-i18n-attr="text">Date Range</div><div class="meta-value" id="metaDates" style="font-size:14px;margin-top:6px">—</div></div>
     </div>
 
-    <h3 style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:12px">Column Detection</h3>
+    <h3 style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:12px" data-i18n="col.detection" data-i18n-attr="text">Column Detection</h3>
     <div class="col-map-table">
       <table>
-        <thead><tr><th>Role</th><th>Detected Column</th><th>Override</th><th>Status</th></tr></thead>
+        <thead><tr><th data-i18n="col.role" data-i18n-attr="text">Role</th><th data-i18n="col.detected" data-i18n-attr="text">Detected Column</th><th data-i18n="col.override" data-i18n-attr="text">Override</th><th data-i18n="col.status" data-i18n-attr="text">Status</th></tr></thead>
         <tbody id="colMapBody"></tbody>
       </table>
     </div>
 
-    <h3 style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:12px">Attribute Filters Auto-Detected</h3>
+    <h3 style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:12px" data-i18n="attr.title" data-i18n-attr="text">Attribute Filters Auto-Detected</h3>
     <div id="attrChips" class="attr-chips"></div>
-    <p id="noAttrMsg" style="font-size:13px;color:var(--g90);display:none;margin-bottom:24px">No attribute columns detected. All data will be shown together without filters.</p>
+    <p id="noAttrMsg" style="font-size:13px;color:var(--g90);display:none;margin-bottom:24px" data-i18n="attr.none" data-i18n-attr="text">No attribute columns detected. All data will be shown together without filters.</p>
 
     <div class="summary-actions">
-      <button class="btn-secondary" onclick="goToLanding()">← Upload Different File</button>
-      <button class="btn-primary" id="btnAnalyze" onclick="startAnalysis()">Analyze Dashboard →</button>
+      <button class="btn-secondary" onclick="goToLanding()" data-i18n="btn.upload.diff" data-i18n-attr="text">← Upload Different File</button>
+      <button class="btn-primary" id="btnAnalyze" onclick="startAnalysis()" data-i18n="btn.analyze" data-i18n-attr="text">Analyze Dashboard →</button>
     </div>
   </div>
 </div>
@@ -428,14 +440,14 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
         <rect y="12" width="11" height="11" fill="#00A4EF"/>
         <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
       </svg>
-      <div><h1>Microsoft 365 Copilot Adoption Dashboard</h1></div>
+      <div><h1 data-i18n="app.title" data-i18n-attr="text">Microsoft 365 Copilot Adoption Dashboard</h1></div>
     </div>
   </header>
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px">
     <div class="spinner"></div>
     <div style="text-align:center">
-      <div style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:6px">Analyzing your data…</div>
-      <div style="font-size:13px;color:var(--g90)">Computing metrics, segments, and insights</div>
+      <div style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:6px" data-i18n="loading.title" data-i18n-attr="text">Analyzing your data…</div>
+      <div style="font-size:13px;color:var(--g90)" data-i18n="loading.sub" data-i18n-attr="text">Computing metrics, segments, and insights</div>
     </div>
     <div class="loading-steps" id="loadingSteps">
       <div class="loading-step" id="ls1">⏳ Parsing CSV rows…</div>
@@ -466,28 +478,32 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
       </div>
     </div>
     <div class="dash-right">
-      <a class="btn-ghost" href="glossary.html" target="_blank" style="text-decoration:none;margin-right:8px">📖 Glossary</a>
-      <button class="btn-ghost" onclick="goToLanding()">← New File</button>
+      <div class="lang-switch" style="margin-right:12px">
+        <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn" data-lang="es" onclick="switchLang('es')">ES</button>
+      </div>
+      <a class="btn-ghost" href="glossary.html" target="_blank" style="margin-right:8px" data-i18n="btn.glossary">📖 Glossary</a>
+      <button class="btn-ghost" onclick="goToLanding()" data-i18n="btn.newfile" data-i18n-attr="text">← New File</button>
     </div>
   </header>
 
   <div class="filter-strip" id="filterStrip"></div>
 
   <nav class="tabs-nav" id="tabsNav">
-    <div class="tab-item active" data-tab="overview">Executive Summary</div>
-    <div class="tab-item" data-tab="trends">Weekly Trends</div>
-    <div class="tab-item" data-tab="apps">App Usage</div>
-    <div class="tab-item" data-tab="segments">User Segmentation</div>
-    <div class="tab-item" data-tab="loyalty">Loyalty &amp; Churn</div>
-    <div class="tab-item" data-tab="power">Power Users</div>
-    <div class="tab-item" data-tab="insights">Insights &amp; Recommendations</div>
+    <div class="tab-item active" data-tab="overview" data-i18n="tab.overview" data-i18n-attr="text">Executive Summary</div>
+    <div class="tab-item" data-tab="trends" data-i18n="tab.trends" data-i18n-attr="text">Weekly Trends</div>
+    <div class="tab-item" data-tab="apps" data-i18n="tab.apps" data-i18n-attr="text">App Usage</div>
+    <div class="tab-item" data-tab="segments" data-i18n="tab.segments" data-i18n-attr="text">User Segmentation</div>
+    <div class="tab-item" data-tab="loyalty" data-i18n="tab.loyalty" data-i18n-attr="text">Loyalty &amp; Churn</div>
+    <div class="tab-item" data-tab="power" data-i18n="tab.power" data-i18n-attr="text">Power Users</div>
+    <div class="tab-item" data-tab="insights" data-i18n="tab.insights" data-i18n-attr="text">Insights &amp; Recommendations</div>
   </nav>
 
   <div class="page-wrap">
     <!-- Executive Summary -->
     <div class="dash-page active" id="tab-overview">
-      <h2 class="sec-title">Executive Summary</h2>
-      <p class="sec-sub">Key adoption metrics for the most recent week on record.</p>
+      <h2 class="sec-title" data-i18n="sec.overview" data-i18n-attr="text">Executive Summary</h2>
+      <p class="sec-sub" data-i18n="sec.overview.sub" data-i18n-attr="text">Key adoption metrics for the most recent week on record.</p>
       <div class="kpi-row" id="kpiRow"></div>
       <div id="overviewAlert"></div>
       <div class="ins-grid" id="overviewInsights"></div>
@@ -495,33 +511,33 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
 
     <!-- Weekly Trends -->
     <div class="dash-page" id="tab-trends">
-      <h2 class="sec-title">Weekly Adoption Trends</h2>
-      <p class="sec-sub">View of total Copilot actions, chat prompts, and weekly active users over time.</p>
+      <h2 class="sec-title" data-i18n="sec.trends" data-i18n-attr="text">Weekly Adoption Trends</h2>
+      <p class="sec-sub" data-i18n="sec.trends.sub" data-i18n-attr="text">View of total Copilot actions, chat prompts, and weekly active users over time.</p>
       <div class="grid-1 chart-card">
-        <h3>Total Copilot Actions &amp; Chat Prompts (left axis) &nbsp;&middot;&nbsp; Active Users (right axis)</h3>
+        <h3 data-i18n="chart.trends.title" data-i18n-attr="text">Total Copilot Actions &amp; Chat Prompts (left axis) &nbsp;&middot;&nbsp; Active Users (right axis)</h3>
         <div id="chartTrends" style="height:340px"></div>
       </div>
     </div>
 
     <!-- App Usage -->
     <div class="dash-page" id="tab-apps">
-      <h2 class="sec-title">App Usage Breakdown</h2>
-      <p class="sec-sub">Copilot actions disaggregated by Microsoft 365 application available in this query.</p>
+      <h2 class="sec-title" data-i18n="sec.apps" data-i18n-attr="text">App Usage Breakdown</h2>
+      <p class="sec-sub" data-i18n="sec.apps.sub" data-i18n-attr="text">Copilot actions disaggregated by Microsoft 365 application available in this query.</p>
       <div id="appChartsSection">
         <div class="grid-2">
           <div class="chart-card">
-            <h3>Actions by App &mdash; Weekly</h3>
+            <h3 data-i18n="chart.appbar" data-i18n-attr="text">Actions by App &mdash; Weekly</h3>
             <div id="chartAppBar" style="height:300px"></div>
           </div>
           <div class="chart-card">
-            <h3>App Share &mdash; All Weeks</h3>
+            <h3 data-i18n="chart.appdonut" data-i18n-attr="text">App Share &mdash; All Weeks</h3>
             <div id="chartAppDonut" style="height:300px"></div>
           </div>
         </div>
       </div>
       <div id="appNoData" class="no-data" style="display:none">
         <div class="icon">📊</div>
-        <div>App-level columns (Excel, Outlook, Teams) not found in this CSV.<br>Enable them in Viva Insights query settings.</div>
+        <div data-i18n="app.nodata">App-level columns (Excel, Outlook, Teams) not found in this CSV.<br>Enable them in Viva Insights query settings.</div>
       </div>
       <div id="heatmapSection">
         <div class="chart-card">
@@ -533,15 +549,15 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
 
     <!-- User Segmentation -->
     <div class="dash-page" id="tab-segments">
-      <h2 class="sec-title">User Segmentation</h2>
-      <p class="sec-sub">Proficiency tiers based on Copilot active days per week: L1 Beginner (1&ndash;2 days) &nbsp;&middot;&nbsp; L2 Intermediate (3&ndash;4) &nbsp;&middot;&nbsp; L3 Expert (5+)</p>
+      <h2 class="sec-title" data-i18n="sec.segments" data-i18n-attr="text">User Segmentation</h2>
+      <p class="sec-sub" data-i18n="sec.segments.sub" data-i18n-attr="text">Proficiency tiers based on Copilot active days per week: L1 Beginner (1&ndash;2 days) &nbsp;&middot;&nbsp; L2 Intermediate (3&ndash;4) &nbsp;&middot;&nbsp; L3 Expert (5+)</p>
       <div class="grid-2">
         <div class="chart-card">
-          <h3>Users by Proficiency Tier &mdash; Weekly</h3>
+          <h3 data-i18n="chart.ltierbar" data-i18n-attr="text">Users by Proficiency Tier &mdash; Weekly</h3>
           <div id="chartLtierBar" style="height:300px"></div>
         </div>
         <div class="chart-card">
-          <h3>Tier Distribution &mdash; Latest Week</h3>
+          <h3 data-i18n="chart.ltierdonut" data-i18n-attr="text">Tier Distribution &mdash; Latest Week</h3>
           <div id="chartLtierDonut" style="height:300px"></div>
         </div>
       </div>
@@ -549,26 +565,26 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
 
     <!-- Loyalty & Churn -->
     <div class="dash-page" id="tab-loyalty">
-      <h2 class="sec-title">Loyalty &amp; Churn</h2>
-      <p class="sec-sub">Weekly classification into New, Loyal, and Churned users using a 4-week lookback window.</p>
+      <h2 class="sec-title" data-i18n="sec.loyalty" data-i18n-attr="text">Loyalty &amp; Churn</h2>
+      <p class="sec-sub" data-i18n="sec.loyalty.sub" data-i18n-attr="text">Weekly classification into New, Loyal, and Churned users using a 4-week lookback window.</p>
       <div class="grid-1 chart-card">
-        <h3>New &middot; Loyal &middot; Churned Users per Week</h3>
+        <h3 data-i18n="chart.loyalty" data-i18n-attr="text">New &middot; Loyal &middot; Churned Users per Week</h3>
         <div id="chartLoyalty" style="height:320px"></div>
-        <p class="chart-note">Loyal = active in every one of the 4 preceding weeks &nbsp;&middot;&nbsp; Churned = active in prior 4 weeks but not this week &nbsp;&middot;&nbsp; New = first-time active</p>
+        <p class="chart-note" data-i18n="chart.loyalty.note" data-i18n-attr="text">Loyal = active in every one of the 4 preceding weeks &nbsp;&middot;&nbsp; Churned = active in prior 4 weeks but not this week &nbsp;&middot;&nbsp; New = first-time active</p>
       </div>
     </div>
 
     <!-- Power Users -->
     <div class="dash-page" id="tab-power">
-      <h2 class="sec-title">Power &amp; Habitual Users</h2>
-      <p class="sec-sub">12-week rolling usage segments (vivainsights methodology). Power User: habit &amp; avg &ge; 15 actions/wk &nbsp;&middot;&nbsp; Habitual: IsHabit (active in &ge;9/12 weeks) &nbsp;&middot;&nbsp; Novice: avg &ge; 1</p>
+      <h2 class="sec-title" data-i18n="sec.power" data-i18n-attr="text">Power &amp; Habitual Users</h2>
+      <p class="sec-sub" data-i18n="sec.power.sub" data-i18n-attr="text">12-week rolling usage segments (vivainsights methodology). Power User: habit &amp; avg &ge; 15 actions/wk &nbsp;&middot;&nbsp; Habitual: IsHabit (active in &ge;9/12 weeks) &nbsp;&middot;&nbsp; Novice: avg &ge; 1</p>
       <div class="grid-2">
         <div class="chart-card">
-          <h3>Usage Segments &mdash; Weekly Trend</h3>
+          <h3 data-i18n="chart.segbar" data-i18n-attr="text">Usage Segments &mdash; Weekly Trend</h3>
           <div id="chartSegBar" style="height:300px"></div>
         </div>
         <div class="chart-card">
-          <h3>Segment Distribution &mdash; Latest Week</h3>
+          <h3 data-i18n="chart.segdonut" data-i18n-attr="text">Segment Distribution &mdash; Latest Week</h3>
           <div id="chartSegDonut" style="height:300px"></div>
         </div>
       </div>
@@ -576,18 +592,211 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
 
     <!-- Insights & Recommendations -->
     <div class="dash-page" id="tab-insights">
-      <h2 class="sec-title">Insights &amp; Recommendations</h2>
-      <p class="sec-sub">Data-driven interpretation benchmarked against Microsoft Frontier Firm research and Work Trend Index.</p>
+      <h2 class="sec-title" data-i18n="sec.insights" data-i18n-attr="text">Insights &amp; Recommendations</h2>
+      <p class="sec-sub" data-i18n="sec.insights.sub" data-i18n-attr="text">Data-driven interpretation benchmarked against Microsoft Frontier Firm research and Work Trend Index.</p>
       <div id="insightsContent"></div>
     </div>
   </div>
 
-  <footer class="footer" id="dashFooter">
+  <footer class="footer" id="dashFooter" data-i18n="footer" data-i18n-attr="text">
     Microsoft 365 Copilot Adoption Dashboard &nbsp;&middot;&nbsp; Viva Insights Person Query &nbsp;&middot;&nbsp; Microsoft Internal
   </footer>
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════════════
+// i18n — INTERNATIONALIZATION
+// ═══════════════════════════════════════════════════════════════════════════
+let LANG = 'en';
+const I18N = {
+  // ── Landing page ──
+  'app.title': {en:'Microsoft 365 Copilot Adoption Dashboard', es:'Panel de Adopción de Microsoft 365 Copilot'},
+  'app.sub': {en:'Powered by Viva Insights · Client-side · No data leaves your browser', es:'Desarrollado con Viva Insights · Lado cliente · Ningún dato sale de tu navegador'},
+  'hero.title': {en:'Instant <span>Copilot Analytics</span><br>from your Viva Insights export', es:'Analíticas instantáneas de <span>Copilot</span><br>desde tu exportación de Viva Insights'},
+  'hero.sub': {en:'Upload your Person Query CSV and get a fully interactive, Microsoft-branded adoption dashboard — with Frontier Firm benchmarks, insights, and recommendations — in seconds.', es:'Sube tu CSV de consulta de personas y obtén un panel de adopción interactivo con benchmarks de Frontier Firm, insights y recomendaciones — en segundos.'},
+  'upload.main': {en:'Drag & drop your CSV here', es:'Arrastra y suelta tu CSV aquí'},
+  'upload.sub': {en:'or click to browse files', es:'o haz clic para buscar archivos'},
+  'upload.badge': {en:'Viva Insights Person Query export', es:'Exportación de consulta de personas de Viva Insights'},
+  'privacy': {en:'All analysis runs locally in your browser. No data is uploaded to any server.', es:'Todo el análisis se ejecuta localmente en tu navegador. No se sube ningún dato a ningún servidor.'},
+  'feat.7tab': {en:'7-Tab Interactive Dashboard', es:'Panel interactivo de 7 pestañas'},
+  'feat.filters': {en:'Auto-Detected Attribute Filters', es:'Filtros de atributos auto-detectados'},
+  'feat.bench': {en:'Frontier Firm Benchmarks', es:'Benchmarks de Frontier Firm'},
+  'feat.insights': {en:'Insights & Recommendations', es:'Insights y recomendaciones'},
+  'feat.client': {en:'100% Client-Side Processing', es:'100% procesamiento del lado cliente'},
+  'feat.nocode': {en:'No Code, No Install Required', es:'Sin código, sin instalación'},
+  'col.title': {en:'What columns does the CSV need?', es:'¿Qué columnas necesita el CSV?'},
+  'col.required': {en:'Required (the dashboard won\'t run without these)', es:'Requeridas (el panel no funcionará sin estas)'},
+  'col.optional': {en:'Optional (enables richer charts)', es:'Opcionales (habilitan gráficos más completos)'},
+  'col.auto': {en:'Auto-detected as filters (any string column with ≤ 200 unique values)', es:'Auto-detectadas como filtros (cualquier columna de texto con ≤ 200 valores únicos)'},
+  // ── Summary page ──
+  'summary.sub': {en:'CSV loaded — review and confirm before analysis', es:'CSV cargado — revisa y confirma antes del análisis'},
+  'summary.title': {en:'✓ CSV Loaded Successfully', es:'✓ CSV cargado exitosamente'},
+  'summary.desc': {en:'Review what was detected in your file, then click <strong>Analyze Dashboard</strong> to proceed.', es:'Revisa lo que se detectó en tu archivo, luego haz clic en <strong>Analizar Panel</strong> para continuar.'},
+  'meta.rows': {en:'Total Rows', es:'Total de filas'},
+  'meta.users': {en:'Unique Users', es:'Usuarios únicos'},
+  'meta.weeks': {en:'Weeks', es:'Semanas'},
+  'meta.dates': {en:'Date Range', es:'Rango de fechas'},
+  'col.detection': {en:'Column Detection', es:'Detección de columnas'},
+  'col.role': {en:'Role', es:'Rol'},
+  'col.detected': {en:'Detected Column', es:'Columna detectada'},
+  'col.override': {en:'Override', es:'Anular'},
+  'col.status': {en:'Status', es:'Estado'},
+  'btn.upload.diff': {en:'← Upload Different File', es:'← Subir otro archivo'},
+  'btn.analyze': {en:'Analyze Dashboard →', es:'Analizar Panel →'},
+  'status.detected': {en:'✓ Detected', es:'✓ Detectada'},
+  'status.notfound': {en:'⚠ Not found', es:'⚠ No encontrada'},
+  'status.optional': {en:'— Optional', es:'— Opcional'},
+  'attr.title': {en:'Attribute Filters Auto-Detected', es:'Filtros de atributos auto-detectados'},
+  'attr.none': {en:'No attribute columns detected. All data will be shown together without filters.', es:'No se detectaron columnas de atributos. Todos los datos se mostrarán juntos sin filtros.'},
+  // ── Loading page ──
+  'loading.title': {en:'Analyzing your data…', es:'Analizando tus datos…'},
+  'loading.sub': {en:'Computing metrics, segments, and insights', es:'Calculando métricas, segmentos e insights'},
+  'ls1': {en:'Parsing CSV rows…', es:'Procesando filas del CSV…'},
+  'ls2': {en:'Computing proficiency tiers…', es:'Calculando niveles de competencia…'},
+  'ls3': {en:'Computing 12-week usage segments…', es:'Calculando segmentos de uso (12 semanas)…'},
+  'ls4': {en:'Computing loyalty & churn…', es:'Calculando lealtad y abandono…'},
+  'ls5': {en:'Building insights & recommendations…', es:'Construyendo insights y recomendaciones…'},
+  'ls6': {en:'Preparing dashboard…', es:'Preparando panel…'},
+  // ── Dashboard tabs ──
+  'tab.overview': {en:'Executive Summary', es:'Resumen Ejecutivo'},
+  'tab.trends': {en:'Weekly Trends', es:'Tendencias Semanales'},
+  'tab.apps': {en:'App Usage', es:'Uso por Aplicación'},
+  'tab.segments': {en:'User Segmentation', es:'Segmentación de Usuarios'},
+  'tab.loyalty': {en:'Loyalty & Churn', es:'Lealtad y Abandono'},
+  'tab.power': {en:'Power Users', es:'Usuarios Avanzados'},
+  'tab.insights': {en:'Insights & Recommendations', es:'Insights y Recomendaciones'},
+  // ── Dashboard sections ──
+  'sec.overview': {en:'Executive Summary', es:'Resumen Ejecutivo'},
+  'sec.overview.sub': {en:'Key adoption metrics for the most recent week on record.', es:'Métricas clave de adopción para la semana más reciente registrada.'},
+  'sec.trends': {en:'Weekly Adoption Trends', es:'Tendencias Semanales de Adopción'},
+  'sec.trends.sub': {en:'View of total Copilot actions, chat prompts, and weekly active users over time.', es:'Vista del total de acciones de Copilot, prompts de chat y usuarios activos semanales.'},
+  'sec.apps': {en:'App Usage Breakdown', es:'Desglose de uso por aplicación'},
+  'sec.apps.sub': {en:'Copilot actions disaggregated by Microsoft 365 application available in this query.', es:'Acciones de Copilot desagregadas por aplicación de Microsoft 365 disponible en esta consulta.'},
+  'sec.segments': {en:'User Segmentation', es:'Segmentación de Usuarios'},
+  'sec.segments.sub': {en:'Proficiency tiers based on Copilot active days per week: L1 Beginner (1–2 days) · L2 Intermediate (3–4) · L3 Expert (5+)', es:'Niveles de competencia basados en días activos de Copilot por semana: L1 Principiante (1–2 días) · L2 Intermedio (3–4) · L3 Experto (5+)'},
+  'sec.loyalty': {en:'Loyalty & Churn', es:'Lealtad y Abandono'},
+  'sec.loyalty.sub': {en:'Weekly classification into New, Loyal, and Churned users using a 4-week lookback window.', es:'Clasificación semanal en usuarios Nuevos, Leales y Abandonados usando una ventana de 4 semanas.'},
+  'sec.power': {en:'Power & Habitual Users', es:'Usuarios Avanzados y Habituales'},
+  'sec.power.sub': {en:'12-week rolling usage segments (vivainsights methodology). Power User: habit & avg ≥ 15 actions/wk · Habitual: IsHabit (active in ≥9/12 weeks) · Novice: avg ≥ 1', es:'Segmentos de uso con ventana de 12 semanas (metodología vivainsights). Avanzado: hábito + promedio ≥ 15 acciones/sem · Habitual: activo en ≥9/12 semanas · Novato: promedio ≥ 1'},
+  'sec.insights': {en:'Insights & Recommendations', es:'Insights y Recomendaciones'},
+  'sec.insights.sub': {en:'Data-driven interpretation benchmarked against Microsoft Frontier Firm research and Work Trend Index.', es:'Interpretación basada en datos comparada con la investigación de Frontier Firm de Microsoft y el Work Trend Index.'},
+  // ── KPI cards ──
+  'kpi.active': {en:'Active Users', es:'Usuarios Activos'},
+  'kpi.active.sub': {en:'of {total} licensed', es:'de {total} licenciados'},
+  'kpi.actions': {en:'Total Copilot Actions', es:'Total de Acciones de Copilot'},
+  'kpi.actions.sub': {en:'All actions in latest week', es:'Todas las acciones en la última semana'},
+  'kpi.avg': {en:'Avg Actions / Active User', es:'Acciones Prom. / Usuario Activo'},
+  'kpi.avg.sub': {en:'Per active user in latest week', es:'Por usuario activo en la última semana'},
+  'kpi.prompts': {en:'Copilot Chat Prompts', es:'Prompts de Chat Copilot'},
+  'kpi.prompts.sub': {en:'Work prompts in latest week', es:'Prompts de trabajo en la última semana'},
+  // ── Charts ──
+  'chart.trends.title': {en:'Total Copilot Actions & Chat Prompts (left axis) · Active Users (right axis)', es:'Total de Acciones de Copilot y Prompts de Chat (eje izq.) · Usuarios Activos (eje der.)'},
+  'chart.appbar': {en:'Actions by App — Weekly', es:'Acciones por Aplicación — Semanal'},
+  'chart.appdonut': {en:'App Share — All Weeks', es:'Participación por App — Todas las Semanas'},
+  'chart.heatmap': {en:'Average Weekly Copilot Actions per User — by {attr} (Last 4 Weeks)', es:'Promedio Semanal de Acciones de Copilot por Usuario — por {attr} (Últimas 4 Semanas)'},
+  'chart.ltierbar': {en:'Users by Proficiency Tier — Weekly', es:'Usuarios por Nivel de Competencia — Semanal'},
+  'chart.ltierdonut': {en:'Tier Distribution — Latest Week', es:'Distribución por Nivel — Última Semana'},
+  'chart.loyalty': {en:'New · Loyal · Churned Users per Week', es:'Usuarios Nuevos · Leales · Abandonados por Semana'},
+  'chart.loyalty.note': {en:'Loyal = active in every one of the 4 preceding weeks · Churned = active in prior 4 weeks but not this week · New = first-time active', es:'Leal = activo en todas las 4 semanas anteriores · Abandonado = activo en 4 semanas anteriores pero no esta · Nuevo = activo por primera vez'},
+  'chart.segbar': {en:'Usage Segments — Weekly Trend', es:'Segmentos de Uso — Tendencia Semanal'},
+  'chart.segdonut': {en:'Segment Distribution — Latest Week', es:'Distribución de Segmentos — Última Semana'},
+  // ── App no-data ──
+  'app.nodata': {en:'App-level columns (Excel, Outlook, Teams) not found in this CSV.<br>Enable them in Viva Insights query settings.', es:'Columnas de aplicación (Excel, Outlook, Teams) no encontradas en este CSV.<br>Habilítalas en la configuración de consulta de Viva Insights.'},
+  // ── Filters ──
+  'filter.title': {en:'Filters ({n} attributes)', es:'Filtros ({n} atributos)'},
+  'filter.none': {en:'No attribute filters detected in this CSV.', es:'No se detectaron filtros de atributos en este CSV.'},
+  'filter.clear': {en:'Clear Filters', es:'Limpiar Filtros'},
+  'filter.active': {en:'{n} active filter', es:'{n} filtro activo'},
+  'filter.actives': {en:'{n} active filters', es:'{n} filtros activos'},
+  // ── Buttons ──
+  'btn.newfile': {en:'← New File', es:'← Nuevo Archivo'},
+  'btn.glossary': {en:'📖 Glossary', es:'📖 Glosario'},
+  // ── Alert / Health ──
+  'alert.health': {en:'Adoption Health: {label} · Score {score}/100', es:'Salud de Adopción: {label} · Puntuación {score}/100'},
+  'alert.usage.up': {en:'Overall Copilot usage is <span style="color:var(--green);font-weight:700">▲ +{pct}%</span> vs the first four weeks.', es:'El uso general de Copilot es <span style="color:var(--green);font-weight:700">▲ +{pct}%</span> vs las primeras cuatro semanas.'},
+  'alert.usage.down': {en:'Overall Copilot usage is <span style="color:var(--red);font-weight:700">▼ {pct}%</span> vs the first four weeks.', es:'El uso general de Copilot es <span style="color:var(--red);font-weight:700">▼ {pct}%</span> vs las primeras cuatro semanas.'},
+  // ── Insights labels ──
+  'ins.adoption': {en:'📈 Overall Adoption', es:'📈 Adopción General'},
+  'ins.app': {en:'📱 App & Usage Depth', es:'📱 Profundidad de Uso por App'},
+  'ins.power': {en:'⚡ Power & Habitual Users', es:'⚡ Usuarios Avanzados y Habituales'},
+  'ins.loyalty': {en:'🔄 Loyalty & Retention', es:'🔄 Lealtad y Retención'},
+  'ins.rec.action': {en:'Recommended Action', es:'Acción Recomendada'},
+  // ── Insights Tab ──
+  'ins.healthtitle': {en:'Adoption Health Score', es:'Puntuación de Salud de Adopción'},
+  'ins.kpi.title': {en:'KPI Progress vs Frontier Firm Benchmarks', es:'Progreso de KPIs vs Benchmarks de Frontier Firm'},
+  'ins.active.rate': {en:'Active User Rate', es:'Tasa de Usuarios Activos'},
+  'ins.ph.users': {en:'Power + Habitual Users', es:'Usuarios Avanzados + Habituales'},
+  'ins.l3.share': {en:'L3 Expert Share', es:'Participación de Expertos L3'},
+  'ins.nc.ratio': {en:'New-to-Churned Ratio', es:'Ratio Nuevos/Abandonados'},
+  'ins.avg.actions': {en:'Avg Actions / Active User / Week', es:'Acciones Prom. / Usuario Activo / Semana'},
+  'ins.loyal.ret': {en:'Loyal User Retention', es:'Retención de Usuarios Leales'},
+  'ins.target': {en:'Target', es:'Objetivo'},
+  'ins.metric': {en:'Metric', es:'Métrica'},
+  'ins.cohort': {en:'This Cohort', es:'Este Grupo'},
+  'ins.frontier': {en:'Frontier Firm Target', es:'Objetivo Frontier Firm'},
+  'ins.source': {en:'Benchmark Source', es:'Fuente del Benchmark'},
+  'ins.status': {en:'Status', es:'Estado'},
+  'ins.ontrack': {en:'✓ On Track', es:'✓ En Camino'},
+  'ins.developing': {en:'Developing', es:'En Desarrollo'},
+  'ins.needsfocus': {en:'Needs Focus', es:'Requiere Atención'},
+  // ── Recommendations ──
+  'rec.title': {en:'🎯 Strategic Recommendations', es:'🎯 Recomendaciones Estratégicas'},
+  'rec.hipri': {en:'High Priority', es:'Alta Prioridad'},
+  'rec.medpri': {en:'Medium Priority', es:'Media Prioridad'},
+  'rec.ongoing': {en:'Ongoing', es:'Continuo'},
+  'rec.champions.title': {en:'Activate an AI Champions Network', es:'Activar una Red de Campeones de IA'},
+  'rec.habit.title': {en:'Close the Habit Gap with a 30-Day Structured Programme', es:'Cerrar la Brecha de Hábito con un Programa Estructurado de 30 Días'},
+  'rec.churn.title': {en:'Address Churn & Deepen Loyalty', es:'Abordar el Abandono y Profundizar la Lealtad'},
+  'rec.multiapp.title': {en:'Grow Multi-App Copilot Adoption Beyond {app}', es:'Ampliar la Adopción de Copilot Más Allá de {app}'},
+  'rec.measure.title': {en:'Measure Impact, Not Just Activity', es:'Medir Impacto, No Solo Actividad'},
+  // ── Health labels ──
+  'health.strong': {en:'Strong', es:'Fuerte'},
+  'health.developing': {en:'Developing', es:'En Desarrollo'},
+  'health.early': {en:'Early Stage', es:'Etapa Temprana'},
+  'health.frontier': {en:'Frontier Firm', es:'Frontier Firm'},
+  // ── Retention labels ──
+  'ret.growing': {en:'Growing', es:'Creciendo'},
+  'ret.stable': {en:'Stable', es:'Estable'},
+  'ret.atrisk': {en:'At-Risk', es:'En Riesgo'},
+  // ── Footer ──
+  'footer': {en:'Microsoft 365 Copilot Adoption Dashboard · Viva Insights Person Query · Microsoft Internal', es:'Panel de Adopción de Microsoft 365 Copilot · Consulta de Personas de Viva Insights · Microsoft Interno'},
+  // ── Role labels ──
+  'role.pid': {en:'User ID', es:'ID de Usuario'},
+  'role.date': {en:'Week Date', es:'Fecha de Semana'},
+  'role.total': {en:'Total Copilot Actions', es:'Total de Acciones de Copilot'},
+  'role.active': {en:'Active Days', es:'Días Activos'},
+  'role.prompts': {en:'Chat Prompts', es:'Prompts de Chat'},
+  'role.excel': {en:'Excel Actions', es:'Acciones en Excel'},
+  'role.outlook': {en:'Outlook Actions', es:'Acciones en Outlook'},
+  'role.teams': {en:'Teams (Summarize)', es:'Teams (Resumir)'},
+};
+function t(key, params){  
+  const entry = I18N[key];
+  let s = entry ? (entry[LANG] || entry.en) : key;
+  if (params) Object.entries(params).forEach(([k,v]) => { s = s.replace(new RegExp('\\{'+k+'\\}','g'), v); });
+  return s;
+}
+function switchLang(lang){
+  LANG = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  applyStaticTranslations();
+  // Re-render dashboard if visible
+  if (document.getElementById('page-dashboard').style.display !== 'none' && ENRICHED_ROWS.length > 0){
+    buildFilterStrip();
+    renderActive();
+  }
+}
+function applyStaticTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const mode = el.dataset.i18nAttr || 'html';
+    if (mode === 'text') el.textContent = t(key);
+    else el.innerHTML = t(key);
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -955,8 +1164,7 @@ function renderHeatmap(rows){
   const attrCol = ATTR_COLS.find(a => !ACTIVE_FILTERS[a] || ACTIVE_FILTERS[a] === 'All');
   if (!attrCol){ hmSection.style.display='none'; return; }
   hmSection.style.display = 'block';
-  document.getElementById('heatmapTitle').textContent =
-    `Average Weekly Copilot Actions per User — by ${attrCol} (Last 4 Weeks)`;
+  document.getElementById('heatmapTitle').textContent = t('chart.heatmap',{attr:attrCol});
   const weeks = unique(rows.map(r=>r.dateMs)).sort((a,b)=>a-b).slice(-4);
   const rRows = rows.filter(r => weeks.includes(r.dateMs));
   const matrix = {};
@@ -1084,24 +1292,24 @@ function renderSegDonut(rows){
 function kpiHTML(k){
   return `
     <div class="kpi-card">
-      <div class="kpi-lbl">Active Users</div>
+      <div class="kpi-lbl">${t('kpi.active')}</div>
       <div class="kpi-val">${fmtNum(k.active)}</div>
-      <div class="kpi-sub">${k.pct}% of ${fmtNum(k.total)} licensed &nbsp;&middot;&nbsp; ${k.latestWeek}</div>
+      <div class="kpi-sub">${k.pct}% ${t('kpi.active.sub',{total:fmtNum(k.total)})} &nbsp;&middot;&nbsp; ${k.latestWeek}</div>
     </div>
     <div class="kpi-card p">
-      <div class="kpi-lbl">Total Copilot Actions</div>
+      <div class="kpi-lbl">${t('kpi.actions')}</div>
       <div class="kpi-val">${k.actions}</div>
-      <div class="kpi-sub">All actions in latest week</div>
+      <div class="kpi-sub">${t('kpi.actions.sub')}</div>
     </div>
     <div class="kpi-card g">
-      <div class="kpi-lbl">Avg Actions / Active User</div>
+      <div class="kpi-lbl">${t('kpi.avg')}</div>
       <div class="kpi-val">${k.avgActions}</div>
-      <div class="kpi-sub">Per active user in latest week</div>
+      <div class="kpi-sub">${t('kpi.avg.sub')}</div>
     </div>
     <div class="kpi-card t">
-      <div class="kpi-lbl">Copilot Chat Prompts</div>
+      <div class="kpi-lbl">${t('kpi.prompts')}</div>
       <div class="kpi-val">${k.prompts}</div>
-      <div class="kpi-sub">Work prompts in latest week</div>
+      <div class="kpi-sub">${t('kpi.prompts.sub')}</div>
     </div>`;
 }
 
@@ -1112,20 +1320,101 @@ function alertHTML(ins){
   const trendStr = up
     ? `<span style="color:var(--green);font-weight:700">▲ +${Math.abs(ins.trendPct)}%</span>`
     : `<span style="color:var(--red);font-weight:700">▼ ${ins.trendPct}%</span>`;
+  const usageMsg = LANG==='es'
+    ? `El uso general de Copilot es ${trendStr} vs las primeras cuatro semanas.`
+    : `Overall Copilot usage is ${trendStr} vs the first four weeks.`;
+  const activeMsg = LANG==='es'
+    ? `<strong>${fmtNum(ins.activeU)}</strong> usuarios (${ins.pctAct}% de ${fmtNum(ins.totalU)} licenciados) activos en la última semana — <em>${ins.adoptionStage}</em>.`
+    : `<strong>${fmtNum(ins.activeU)}</strong> users (${ins.pctAct}% of ${fmtNum(ins.totalU)} licensed) active in the latest week — <em>${ins.adoptionStage}</em> classification.`;
+  const phMsg = LANG==='es'
+    ? `<strong>${fmtNum(ins.phCount)}</strong> usuarios Power + Habitual (${ins.pctPH}%); ${ins.habitStage}. Ratio Nuevos/Abandonados: <strong>${ins.ncRatio}</strong> — ${ins.retentionHealth}.`
+    : `<strong>${fmtNum(ins.phCount)}</strong> Power + Habitual users (${ins.pctPH}%); ${ins.habitStage}. New-to-Churned ratio: <strong>${ins.ncRatio}</strong> — ${ins.retentionHealth}.`;
   return `<div class="alert ${cls}">
     <div class="alert-icon">${ico}</div>
     <div class="alert-cnt">
-      <div class="alert-title">Adoption Health: ${ins.healthLabel} &nbsp;·&nbsp; Score ${ins.healthScore}/100</div>
-      Overall Copilot usage is ${trendStr} vs the first four weeks.
-      <strong>${fmtNum(ins.activeU)}</strong> users (${ins.pctAct}% of ${fmtNum(ins.totalU)} licensed)
-      active in the latest week — <em>${ins.adoptionStage}</em> classification.
-      <strong>${fmtNum(ins.phCount)}</strong> Power + Habitual users (${ins.pctPH}%);
-      ${ins.habitStage}. New-to-Churned ratio: <strong>${ins.ncRatio}</strong> — ${ins.retentionHealth}.
+      <div class="alert-title">${t('alert.health', {label: ins.healthLabel, score: ins.healthScore})}</div>
+      ${usageMsg} ${activeMsg} ${phMsg}
     </div>
   </div>`;
 }
 
 function overviewInsightsHTML(ins){
+  if (LANG === 'es') return `
+  <div class="ins-card">
+    <div class="ins-title">📈 Adopción General</div>
+    <div class="ins-body">
+      <ul>
+        <li><strong>${ins.pctAct}% tasa de usuarios activos</strong> — clasificación ${ins.adoptionStage}
+          (Frontier Firms: ≥70%; Microsoft WTI 2024: 75% de trabajadores del conocimiento usan IA globalmente).</li>
+        <li>Tendencia de adopción <strong>${ins.trendDir === 'up' ? '▲ +' : '▼ '}${Math.abs(ins.trendPct)}%</strong>
+          comparando promedio de primeras vs últimas 4 semanas.</li>
+        <li>Promedio de <strong>${ins.avgActions} acciones por usuario activo</strong> por semana.
+          Los Power Users en investigaciones de Microsoft ahorran 30+ min/día usando Copilot regularmente.</li>
+      </ul>
+      <div class="ins-rec"><strong>Acción Recomendada</strong>
+        <ul>
+          <li>Establecer 70% de tasa de usuarios activos como objetivo a 90 días con seguimiento semanal.</li>
+          <li>Identificar el top 10% por volumen de acciones — convertirlos en Campeones de Copilot.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ins-card ap">
+    <div class="ins-title">📱 Profundidad de Uso por App</div>
+    <div class="ins-body">
+      <ul>
+        <li><strong>${ins.topApp}</strong> lidera el uso de apps con <strong>${ins.topAppPct}%</strong> de las acciones rastreadas.
+          El uso concentrado puede limitar el descubrimiento de Copilot en otras aplicaciones.</li>
+        <li><strong>${ins.pctL3}%</strong> de usuarios son Expertos L3 (5+ días activos/semana) —
+          el grupo más probable de lograr ganancias de productividad compuestas.</li>
+        <li>Microsoft WTI: Los usuarios de Copilot editaron 10% más documentos en Word, Excel y PowerPoint.
+          La adopción multi-app multiplica estos beneficios.</li>
+      </ul>
+      <div class="ins-rec"><strong>Acción Recomendada</strong>
+        <ul>
+          <li>Organizar sesiones "Copilot en un Día" específicas por app más allá de ${ins.topApp}.</li>
+          <li>Objetivo: 25%+ de Expertos L3 en dos trimestres.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ins-card ag">
+    <div class="ins-title">⚡ Usuarios Avanzados y Habituales</div>
+    <div class="ins-body">
+      <ul>
+        <li><strong>${fmtNum(ins.powerCount)}</strong> Usuarios Avanzados y <strong>${fmtNum(ins.habitualCount)}</strong>
+          Usuarios Habituales (metodología vivainsights de 12 semanas).</li>
+        <li>Participación combinada: <strong>${ins.pctPH}%</strong> — ${ins.habitStage} (objetivo Frontier Firm: 20%+).</li>
+        <li>Los Power Users son 68% más propensos a experimentar con IA y
+          66% más propensos a rediseñar procesos de negocio. <em>(Fuente: Work Trend Index)</em></li>
+      </ul>
+      <div class="ins-rec"><strong>Acción Recomendada</strong>
+        <ul>
+          <li>Nominar Power Users como Campeones de IA con responsabilidades de coaching entre pares.</li>
+          <li>Lanzar un programa "Constructor de Hábitos" de 30 días para usuarios Novatos.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ins-card at">
+    <div class="ins-title">🔄 Lealtad y Retención</div>
+    <div class="ins-body">
+      <ul>
+        <li>Ratio Nuevos/Abandonados: <strong>${ins.ncRatio}</strong> — <strong>${ins.retentionHealth}</strong>
+          (Creciendo ≥1.2, Estable 0.8–1.2, En Riesgo &lt;0.8).</li>
+        <li><strong>${fmtNum(ins.loyalU)}</strong> Usuarios Leales y <strong>${fmtNum(ins.churnedU)}</strong>
+          Usuarios Abandonados en la última semana (ventana de 4 semanas).</li>
+        <li>Los usuarios recurrentes generan 2–3× más acciones que los nuevos — la retención tiene un impacto desproporcionado.</li>
+      </ul>
+      <div class="ins-rec"><strong>Acción Recomendada</strong>
+        <ul>
+          <li>Encuestar usuarios abandonados dentro de 2 semanas para identificar principales puntos de fricción.</li>
+          <li>Desplegar recordatorios de Viva Insights para usuarios inactivos 2+ semanas consecutivas.</li>
+        </ul>
+      </div>
+    </div>
+  </div>`;
+
   return `
   <div class="ins-card">
     <div class="ins-title">📈 Overall Adoption</div>
@@ -1206,24 +1495,40 @@ function overviewInsightsHTML(ins){
 function insightsTabHTML(ins){
   const stCls = ins.adoptionStage==='Frontier Firm'?'badge-green':ins.adoptionStage==='Developing'?'badge-blue':'badge-yellow';
   const phSt  = ins.pctPH>=20?'badge-green':ins.pctPH>=10?'badge-blue':'badge-yellow';
-  const phLbl = ins.pctPH>=20?'✓ On Track':ins.pctPH>=10?'Developing':'Needs Focus';
+  const phLbl = ins.pctPH>=20?t('ins.ontrack'):ins.pctPH>=10?t('ins.developing'):t('ins.needsfocus');
   const l3St  = ins.pctL3>=25?'badge-green':ins.pctL3>=12?'badge-blue':'badge-yellow';
-  const l3Lbl = ins.pctL3>=25?'✓ On Track':ins.pctL3>=12?'Developing':'Needs Focus';
+  const l3Lbl = ins.pctL3>=25?t('ins.ontrack'):ins.pctL3>=12?t('ins.developing'):t('ins.needsfocus');
   const acSt  = ins.pctAct>=70?'badge-green':ins.pctAct>=50?'badge-blue':'badge-yellow';
-  const acLbl = ins.pctAct>=70?'✓ On Track':ins.pctAct>=50?'Developing':'Needs Focus';
+  const acLbl = ins.pctAct>=70?t('ins.ontrack'):ins.pctAct>=50?t('ins.developing'):t('ins.needsfocus');
   const ncSt  = ins.ncRatio>=1.2?'badge-green':ins.ncRatio>=0.8?'badge-blue':'badge-red';
   const avSt  = ins.avgActions>=15?'badge-green':ins.avgActions>=8?'badge-blue':'badge-yellow';
-  const avLbl = ins.avgActions>=15?'✓ On Track':ins.avgActions>=8?'Developing':'Needs Focus';
-  const healthDesc = ins.healthScore>=75
-    ? 'Strong performance reflecting embedded AI workflows and meaningful productivity uplift.'
-    : ins.healthScore>=50
-    ? 'Good momentum with clear opportunities to deepen habitual usage and close the churn gap.'
-    : 'Early-stage — prioritise awareness, structured training, and friction removal to advance.';
-  const churnMsg = ins.retentionHealth==='Growing'
-    ? 'The base is growing — convert new users into loyal ones within their first 4 weeks through structured onboarding.'
-    : ins.retentionHealth==='Stable'
-    ? 'Acquisition and churn are broadly balanced. Focus on deepening loyalty to build a compounding effect.'
-    : 'Churn is offsetting new user gains. Survey lapsed users immediately and deploy quick-win fixes.';
+  const avLbl = ins.avgActions>=15?t('ins.ontrack'):ins.avgActions>=8?t('ins.developing'):t('ins.needsfocus');
+
+  const healthDesc = LANG==='es'
+    ? (ins.healthScore>=75
+      ? 'Rendimiento fuerte que refleja flujos de trabajo de IA integrados y mejora significativa de productividad.'
+      : ins.healthScore>=50
+      ? 'Buen impulso con oportunidades claras para profundizar el uso habitual y cerrar la brecha de abandono.'
+      : 'Etapa temprana — priorizar concienciación, formación estructurada y eliminación de fricciones para avanzar.')
+    : (ins.healthScore>=75
+      ? 'Strong performance reflecting embedded AI workflows and meaningful productivity uplift.'
+      : ins.healthScore>=50
+      ? 'Good momentum with clear opportunities to deepen habitual usage and close the churn gap.'
+      : 'Early-stage — prioritise awareness, structured training, and friction removal to advance.');
+
+  const churnMsg = LANG==='es'
+    ? (ins.retentionHealth==='Growing'
+      ? 'La base está creciendo — convierte nuevos usuarios en leales en sus primeras 4 semanas con onboarding estructurado.'
+      : ins.retentionHealth==='Stable'
+      ? 'Adquisición y abandono están equilibrados. Enfócate en profundizar la lealtad para un efecto compuesto.'
+      : 'El abandono está compensando los nuevos usuarios. Encuesta usuarios inactivos inmediatamente y despliega soluciones rápidas.')
+    : (ins.retentionHealth==='Growing'
+      ? 'The base is growing — convert new users into loyal ones within their first 4 weeks through structured onboarding.'
+      : ins.retentionHealth==='Stable'
+      ? 'Acquisition and churn are broadly balanced. Focus on deepening loyalty to build a compounding effect.'
+      : 'Churn is offsetting new user gains. Survey lapsed users immediately and deploy quick-win fixes.');
+
+  const targetLbl = LANG==='es' ? 'Objetivo' : 'Target';
 
   return `
   <div class="health-box">
@@ -1231,29 +1536,28 @@ function insightsTabHTML(ins){
       <div class="score">${ins.healthScore}</div><div class="lbl">/ 100</div>
     </div>
     <div class="health-detail">
-      <h3>Adoption Health Score &nbsp;<span class="badge ${stCls}">${ins.adoptionStage}</span></h3>
-      <p>Composite of active-user rate (30%), Power+Habitual share (30%), L3 Expert share (20%),
-         and retention ratio (20%). Score: <strong>${ins.healthScore}</strong> — <strong>${ins.healthLabel}</strong>. ${healthDesc}</p>
+      <h3>${t('ins.healthtitle')} &nbsp;<span class="badge ${stCls}">${ins.adoptionStage}</span></h3>
+      <p>${LANG==='es'?'Compuesto de tasa de usuarios activos (30%), participación Power+Habitual (30%), participación L3 Experto (20%) y ratio de retención (20%).':'Composite of active-user rate (30%), Power+Habitual share (30%), L3 Expert share (20%), and retention ratio (20%).'} Score: <strong>${ins.healthScore}</strong> — <strong>${ins.healthLabel}</strong>. ${healthDesc}</p>
     </div>
   </div>
 
   <div class="chart-card" style="margin-bottom:20px">
-    <h3>KPI Progress vs Frontier Firm Benchmarks</h3>
+    <h3>${t('ins.kpi.title')}</h3>
     <div style="padding:8px 0">
       <div class="prog-group">
-        <div class="prog-lbl"><span>Active User Rate (${ins.pctAct}%)</span><span>Target: 70%</span></div>
+        <div class="prog-lbl"><span>${t('ins.active.rate')} (${ins.pctAct}%)</span><span>${targetLbl}: 70%</span></div>
         <div class="prog-bg"><div class="prog-bar bar-blue" id="pb1" style="width:0%"></div></div>
       </div>
       <div class="prog-group">
-        <div class="prog-lbl"><span>Power + Habitual Users (${ins.pctPH}%)</span><span>Target: 20%</span></div>
+        <div class="prog-lbl"><span>${t('ins.ph.users')} (${ins.pctPH}%)</span><span>${targetLbl}: 20%</span></div>
         <div class="prog-bg"><div class="prog-bar bar-purple" id="pb2" style="width:0%"></div></div>
       </div>
       <div class="prog-group">
-        <div class="prog-lbl"><span>L3 Expert Users (${ins.pctL3}%)</span><span>Target: 25%</span></div>
+        <div class="prog-lbl"><span>${t('ins.l3.share')} (${ins.pctL3}%)</span><span>${targetLbl}: 25%</span></div>
         <div class="prog-bg"><div class="prog-bar bar-teal" id="pb3" style="width:0%"></div></div>
       </div>
       <div class="prog-group">
-        <div class="prog-lbl"><span>Loyal User Retention</span><span>Target: 60%+ of active</span></div>
+        <div class="prog-lbl"><span>${t('ins.loyal.ret')}</span><span>${targetLbl}: 60%+</span></div>
         <div class="prog-bg"><div class="prog-bar bar-green" id="pb4" style="width:0%"></div></div>
       </div>
     </div>
@@ -1261,67 +1565,61 @@ function insightsTabHTML(ins){
 
   <div class="bench-table" style="margin-bottom:22px">
     <table>
-      <thead><tr><th>Metric</th><th>This Cohort</th><th>Frontier Firm Target</th><th>Benchmark Source</th><th>Status</th></tr></thead>
+      <thead><tr><th>${t('ins.metric')}</th><th>${t('ins.cohort')}</th><th>${t('ins.frontier')}</th><th>${t('ins.source')}</th><th>${t('ins.status')}</th></tr></thead>
       <tbody>
-        <tr><td><strong>Active User Rate</strong></td><td>${ins.pctAct}%</td><td>≥ 70%</td>
-          <td>Microsoft WTI 2024: 75% of global knowledge workers use AI</td>
+        <tr><td><strong>${t('ins.active.rate')}</strong></td><td>${ins.pctAct}%</td><td>≥ 70%</td>
+          <td>Microsoft WTI 2024</td>
           <td><span class="badge ${acSt}">${acLbl}</span></td></tr>
-        <tr><td><strong>Power + Habitual Users</strong></td><td>${ins.pctPH}%</td><td>≥ 20%</td>
-          <td>vivainsights identify_usage_segments · Frontier Firm definition</td>
+        <tr><td><strong>${t('ins.ph.users')}</strong></td><td>${ins.pctPH}%</td><td>≥ 20%</td>
+          <td>vivainsights · Frontier Firm</td>
           <td><span class="badge ${phSt}">${phLbl}</span></td></tr>
-        <tr><td><strong>L3 Expert Share</strong></td><td>${ins.pctL3}%</td><td>≥ 25%</td>
-          <td>5+ active days/wk signals embedded workflow usage</td>
+        <tr><td><strong>${t('ins.l3.share')}</strong></td><td>${ins.pctL3}%</td><td>≥ 25%</td>
+          <td>5+ ${LANG==='es'?'días activos/sem':'active days/wk'}</td>
           <td><span class="badge ${l3St}">${l3Lbl}</span></td></tr>
-        <tr><td><strong>New-to-Churned Ratio</strong></td><td>${ins.ncRatio}</td><td>≥ 1.2 (Growing)</td>
-          <td>4-week retention lookback · Stable = 0.8–1.2</td>
+        <tr><td><strong>${t('ins.nc.ratio')}</strong></td><td>${ins.ncRatio}</td><td>≥ 1.2</td>
+          <td>${LANG==='es'?'Retención 4 semanas':'4-week retention lookback'}</td>
           <td><span class="badge ${ncSt}">${ins.retentionHealth}</span></td></tr>
-        <tr><td><strong>Avg Actions / Active User / Week</strong></td><td>${ins.avgActions}</td><td>≥ 15</td>
-          <td>Microsoft WTI: Power users save 30+ min/day</td>
+        <tr><td><strong>${t('ins.avg.actions')}</strong></td><td>${ins.avgActions}</td><td>≥ 15</td>
+          <td>Microsoft WTI</td>
           <td><span class="badge ${avSt}">${avLbl}</span></td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="rec-section">
-    <h3>🎯 Strategic Recommendations</h3>
+    <h3>${t('rec.title')}</h3>
     <div class="rec-item">
-      <span class="pri-tag pri-hi">High Priority</span>
-      <h4>Activate an AI Champions Network</h4>
-      <p>Your <strong>${fmtNum(ins.powerCount)} Power Users</strong> are your most valuable adoption asset.
-         Formalise their role with peer coaching responsibilities, leadership visibility, and early access to new features.
-         Microsoft WTI: Power users are 61% more likely to hear from their CEO about AI — leadership endorsement
-         is the strongest predictor of broader adoption lift.</p>
+      <span class="pri-tag pri-hi">${t('rec.hipri')}</span>
+      <h4>${t('rec.champions.title')}</h4>
+      <p>${LANG==='es'
+        ?`Tus <strong>${fmtNum(ins.powerCount)} Power Users</strong> son tu activo de adopción más valioso. Formaliza su rol con coaching entre pares, visibilidad ante liderazgo y acceso anticipado a nuevas funciones. Microsoft WTI: Los Power Users son 61% más propensos a escuchar de su CEO sobre IA.`
+        :`Your <strong>${fmtNum(ins.powerCount)} Power Users</strong> are your most valuable adoption asset. Formalise their role with peer coaching responsibilities, leadership visibility, and early access to new features. Microsoft WTI: Power users are 61% more likely to hear from their CEO about AI — leadership endorsement is the strongest predictor of broader adoption lift.`}</p>
     </div>
     <div class="rec-item" style="border-left-color:var(--purple)">
-      <span class="pri-tag pri-hi">High Priority</span>
-      <h4>Close the Habit Gap with a 30-Day Structured Programme</h4>
-      <p>At <strong>${ins.pctPH}%</strong> Power + Habitual users (target: 20%), deploy a 4-week prompting challenge
-         for Novice users: one workflow-relevant use case per week
-         (Teams meeting recap → Outlook email drafting → Excel data analysis → Word document drafting).
-         Users need to be active in ≥9 of 12 weeks to reach Habitual status.</p>
+      <span class="pri-tag pri-hi">${t('rec.hipri')}</span>
+      <h4>${t('rec.habit.title')}</h4>
+      <p>${LANG==='es'
+        ?`Con <strong>${ins.pctPH}%</strong> Power + Habitual (objetivo: 20%), despliega un reto de prompting de 4 semanas para Novatos: un caso de uso por semana (Teams recap → Outlook redacción → Excel análisis → Word documentos). Se necesita estar activo ≥9 de 12 semanas para alcanzar status Habitual.`
+        :`At <strong>${ins.pctPH}%</strong> Power + Habitual users (target: 20%), deploy a 4-week prompting challenge for Novice users: one workflow-relevant use case per week (Teams meeting recap → Outlook email drafting → Excel data analysis → Word document drafting). Users need to be active in ≥9 of 12 weeks to reach Habitual status.`}</p>
     </div>
     <div class="rec-item" style="border-left-color:var(--green)">
-      <span class="pri-tag pri-med">Medium Priority</span>
-      <h4>Address Churn &amp; Deepen Loyalty</h4>
-      <p>${churnMsg} Returning Copilot users generate 2–3× more actions than first-time users,
-         making retention a higher-ROI lever than new acquisition.
-         Implement Viva Insights nudges for users inactive ≥2 consecutive weeks.</p>
+      <span class="pri-tag pri-med">${t('rec.medpri')}</span>
+      <h4>${LANG==='es'?'Abordar el Abandono y Profundizar la Lealtad':'Address Churn &amp; Deepen Loyalty'}</h4>
+      <p>${churnMsg} ${LANG==='es'?'Los usuarios recurrentes generan 2–3× más acciones. Implementa recordatorios de Viva Insights para usuarios inactivos ≥2 semanas consecutivas.':'Returning Copilot users generate 2–3× more actions than first-time users, making retention a higher-ROI lever than new acquisition. Implement Viva Insights nudges for users inactive ≥2 consecutive weeks.'}</p>
     </div>
     <div class="rec-item" style="border-left-color:var(--teal)">
-      <span class="pri-tag pri-med">Medium Priority</span>
-      <h4>Grow Multi-App Copilot Adoption Beyond ${ins.topApp}</h4>
-      <p><strong>${ins.topApp}</strong> accounts for <strong>${ins.topAppPct}%</strong> of all tracked app actions.
-         Unlocking Copilot across Outlook, Teams, and Word compounds time savings significantly.
-         Microsoft WTI: Copilot users read 11% fewer emails and edited 10% more documents —
-         gains that only materialise with multi-app adoption.</p>
+      <span class="pri-tag pri-med">${t('rec.medpri')}</span>
+      <h4>${t('rec.multiapp.title',{app:ins.topApp})}</h4>
+      <p>${LANG==='es'
+        ?`<strong>${ins.topApp}</strong> representa <strong>${ins.topAppPct}%</strong> de todas las acciones rastreadas. Desbloquear Copilot en Outlook, Teams y Word multiplica el ahorro de tiempo significativamente.`
+        :`<strong>${ins.topApp}</strong> accounts for <strong>${ins.topAppPct}%</strong> of all tracked app actions. Unlocking Copilot across Outlook, Teams, and Word compounds time savings significantly. Microsoft WTI: Copilot users read 11% fewer emails and edited 10% more documents — gains that only materialise with multi-app adoption.`}</p>
     </div>
     <div class="rec-item" style="border-left-color:var(--orange)">
-      <span class="pri-tag pri-lo">Ongoing</span>
-      <h4>Measure Impact, Not Just Activity</h4>
-      <p>Pair this dashboard with a quarterly Copilot impact survey capturing time saved per task
-         and quality improvements. Microsoft estimates: Power Users save 30+ min/day; the top 5%
-         of Teams users summarised 8 hours of meetings in a single month — equivalent to a full
-         workday reclaimed. Report outcomes at leadership level to sustain executive sponsorship.</p>
+      <span class="pri-tag pri-lo">${t('rec.ongoing')}</span>
+      <h4>${t('rec.measure.title')}</h4>
+      <p>${LANG==='es'
+        ?'Complementa este panel con una encuesta trimestral de impacto de Copilot capturando tiempo ahorrado por tarea y mejoras de calidad. Microsoft estima: Power Users ahorran 30+ min/día. Reporta resultados al nivel de liderazgo para mantener el patrocinio ejecutivo.'
+        :'Pair this dashboard with a quarterly Copilot impact survey capturing time saved per task and quality improvements. Microsoft estimates: Power Users save 30+ min/day; the top 5% of Teams users summarised 8 hours of meetings in a single month — equivalent to a full workday reclaimed. Report outcomes at leadership level to sustain executive sponsorship.'}</p>
     </div>
   </div>`;
 }
@@ -1407,27 +1705,28 @@ function goToLanding(){
 }
 
 function setLoadingStep(n){
+  const labels = [t('ls1'),t('ls2'),t('ls3'),t('ls4'),t('ls5'),t('ls6')];
   for (let i=1; i<=6; i++){
     const el = document.getElementById('ls'+i);
-    if (i < n)       { el.className='loading-step done'; el.textContent='✓ '+el.textContent.replace(/^[✓⏳▶] /,''); }
-    else if (i === n){ el.className='loading-step active'; el.textContent='▶ '+el.textContent.replace(/^[✓⏳▶] /,''); }
-    else             { el.className='loading-step'; }
+    if (i < n)       { el.className='loading-step done'; el.textContent='✓ '+labels[i-1]; }
+    else if (i === n){ el.className='loading-step active'; el.textContent='▶ '+labels[i-1]; }
+    else             { el.className='loading-step'; el.textContent='⏳ '+labels[i-1]; }
   }
 }
 
 function buildFilterStrip(){
   const strip = document.getElementById('filterStrip');
-  if (ATTR_COLS.length === 0){ strip.innerHTML='<span style="font-size:13px;color:var(--g90);padding:10px 28px;display:block">No attribute filters detected in this CSV.</span>'; return; }
+  if (ATTR_COLS.length === 0){ strip.innerHTML=`<span style="font-size:13px;color:var(--g90);padding:10px 28px;display:block">${t('filter.none')}</span>`; return; }
   let html = `<div class="filter-header">`;
-  html += `<button class="filter-toggle" id="filterToggle" onclick="toggleFilters()"><span class="arrow">▼</span> Filters (${ATTR_COLS.length} attributes)</button>`;
-  html += `<button class="btn-clear-filters" onclick="clearFilters()">Clear Filters</button>`;
+  html += `<button class="filter-toggle" id="filterToggle" onclick="toggleFilters()"><span class="arrow">▼</span> ${t('filter.title',{n:ATTR_COLS.length})}</button>`;
+  html += `<button class="btn-clear-filters" onclick="clearFilters()">${t('filter.clear')}</button>`;
   html += `<span class="filter-active-count" id="activeFilterCount"></span>`;
   html += `</div>`;
   html += `<div class="filter-body" id="filterBody">`;
   for (const a of ATTR_COLS){
     const vals = ATTR_VALUES[a] || [];
     html += `<select class="filter-select" onchange="onFilterChange('${a.replace(/'/g,"\\'")}',this.value)">`;
-    html += `<option value="All">${a}: All (${vals.length})</option>`;
+    html += `<option value="All">${a}: ${LANG==='es'?'Todos':'All'} (${vals.length})</option>`;
     for (const v of vals) html += `<option value="${v}">${v}</option>`;
     html += `</select>`;
   }
@@ -1446,7 +1745,7 @@ function onFilterChange(col, val){
   ACTIVE_FILTERS[col] = val;
   const cnt = activeFilterCount();
   const el = document.getElementById('activeFilterCount');
-  if (el) el.textContent = cnt > 0 ? `${cnt} active filter${cnt>1?'s':''}` : '';
+  if (el) el.textContent = cnt > 0 ? t(cnt>1?'filter.actives':'filter.active',{n:cnt}) : '';
   renderActive();
 }
 
@@ -1495,21 +1794,21 @@ function renderSummaryPage(rawRows, headers){
 
   // Column mapping table
   const ROLES = [
-    {key:'pid',    label:'User ID',           req:true},
-    {key:'date',   label:'Week Date',          req:true},
-    {key:'total',  label:'Total Copilot Actions', req:true},
-    {key:'active', label:'Active Days',        req:true},
-    {key:'prompts',label:'Chat Prompts',       req:false},
-    {key:'excel',  label:'Excel Actions',      req:false},
-    {key:'outlook',label:'Outlook Actions',    req:false},
-    {key:'teams',  label:'Teams (Summarize)',  req:false},
+    {key:'pid',    label:t('role.pid'),     req:true},
+    {key:'date',   label:t('role.date'),    req:true},
+    {key:'total',  label:t('role.total'),   req:true},
+    {key:'active', label:t('role.active'),  req:true},
+    {key:'prompts',label:t('role.prompts'), req:false},
+    {key:'excel',  label:t('role.excel'),   req:false},
+    {key:'outlook',label:t('role.outlook'), req:false},
+    {key:'teams',  label:t('role.teams'),   req:false},
   ];
   let tbl = '';
   for (const r of ROLES){
     const detected = COL_MAP[r.key];
     const status = detected
-      ? `<span class="status-ok">✓ Detected</span>`
-      : r.req ? `<span class="status-miss">⚠ Not found</span>` : `<span style="color:var(--g90)">— Optional</span>`;
+      ? `<span class="status-ok">${t('status.detected')}</span>`
+      : r.req ? `<span class="status-miss">${t('status.notfound')}</span>` : `<span style="color:var(--g90)">${t('status.optional')}</span>`;
     // Override dropdown
     let dd = `<select class="filter-select" style="min-width:200px" onchange="overrideCol('${r.key}',this.value)">`;
     dd += `<option value="">— Not available —</option>`;
@@ -1578,7 +1877,7 @@ function overrideCol(key, val){
 function startAnalysis(){
   const required = ['pid','date','total','active'];
   const missing = required.filter(k => !COL_MAP[k]);
-  if (missing.length > 0){ alert('Please map all required columns before proceeding.'); return; }
+  if (missing.length > 0){ alert(LANG==='es'?'Por favor mapea todas las columnas requeridas antes de continuar.':'Please map all required columns before proceeding.'); return; }
 
   showPage('page-loading');
 
@@ -1586,10 +1885,7 @@ function startAnalysis(){
   for (let i=1; i<=6; i++){
     const el = document.getElementById('ls'+i);
     el.className='loading-step';
-    const label = ['Parsing CSV rows…','Computing proficiency tiers…',
-      'Computing 12-week usage segments…','Computing loyalty & churn…',
-      'Building insights & recommendations…','Preparing dashboard…'][i-1];
-    el.textContent = '⏳ '+label;
+    el.textContent = '⏳ '+t('ls'+i);
   }
 
   // Use setTimeout chain to allow UI to update between steps
@@ -1626,10 +1922,10 @@ function startAnalysis(){
                 const fmt = ms => new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
                 const dateRange = weeks.length>=2 ? `${fmt(weeks[0])} – ${fmt(weeks[weeks.length-1])}` : '';
                 const attrInfo = ATTR_COLS.length > 0
-                  ? ` · ${ATTR_COLS.length} attribute filter${ATTR_COLS.length>1?'s':''} detected`
+                  ? ` · ${ATTR_COLS.length} ${LANG==='es'?(ATTR_COLS.length>1?'filtros de atributo detectados':'filtro de atributo detectado'):(ATTR_COLS.length>1?'attribute filters detected':'attribute filter detected')}`
                   : '';
                 document.getElementById('dashSubtitle').textContent =
-                  `Viva Insights Person Query · ${dateRange} · ${fmtNum(users)} Users${attrInfo}`;
+                  `Viva Insights Person Query · ${dateRange} · ${fmtNum(users)} ${LANG==='es'?'Usuarios':'Users'}${attrInfo}`;
                 buildFilterStrip();
                 // Set up tab listeners
                 document.querySelectorAll('.tab-item').forEach(t => {
@@ -1664,7 +1960,7 @@ function handleFile(file){
   for (let i=1;i<=6;i++){
     const el=document.getElementById('ls'+i);
     el.className='loading-step';
-    el.textContent='⏳ '+['Parsing CSV rows…','Computing proficiency tiers…','Computing 12-week usage segments…','Computing loyalty & churn…','Building insights & recommendations…','Preparing dashboard…'][i-1];
+    el.textContent='⏳ '+t('ls'+i);
   }
   setLoadingStep(1);
   Papa.parse(file, {
@@ -1700,6 +1996,7 @@ zone.addEventListener('drop', e => {
 
 // ─── Initial state ────────────────────────────────────────────────────────
 showPage('page-landing');
+applyStaticTranslations();
 </script>
 </body>
 </html>
