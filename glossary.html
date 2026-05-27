@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Copilot Adoption Dashboard – Methodology &amp; Glossary</title>
+<style>
+:root{
+  --blue:#0078D4;--dark:#003B73;--light-blue:#DEECF9;
+  --purple:#5C2D91;--green:#107C10;--teal:#008575;
+  --orange:#FF8C00;--red:#D13438;
+  --g10:#FAF9F8;--g20:#F3F2F1;--g30:#EDEBE9;--g50:#D2D0CE;
+  --g90:#605E5C;--g130:#323130;
+  --radius:12px;--shadow:0 2px 8px rgba(0,0,0,0.08);--shadow-lg:0 8px 32px rgba(0,0,0,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--g10);color:var(--g130);line-height:1.7}
+
+.app-header{background:linear-gradient(135deg,var(--dark),var(--blue) 60%,var(--purple));
+  color:#fff;padding:16px 32px;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;
+  box-shadow:var(--shadow-lg)}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{font-size:18px;font-weight:700;letter-spacing:-0.01em}
+.brand .sub{font-size:11px;opacity:0.75;margin-top:1px}
+.btn-ghost{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+  color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;
+  font-family:inherit;transition:0.2s;backdrop-filter:blur(4px);text-decoration:none}
+.btn-ghost:hover{background:rgba(255,255,255,0.25)}
+
+main{max-width:960px;margin:0 auto;padding:32px 24px 80px}
+h2{font-size:22px;font-weight:700;color:var(--dark);margin:40px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--g30)}
+h3{font-size:16px;font-weight:600;color:var(--blue);margin:24px 0 8px}
+p,li{font-size:14px;color:var(--g130)}
+ul,ol{padding-left:20px;margin-bottom:12px}
+li{margin-bottom:6px}
+code{background:var(--g20);padding:2px 6px;border-radius:4px;font-size:13px;font-family:'Cascadia Code','Consolas',monospace}
+.formula-box{background:#fff;border:1px solid var(--g30);border-radius:var(--radius);
+  padding:16px 20px;margin:12px 0 16px;font-family:'Cascadia Code','Consolas',monospace;
+  font-size:13px;line-height:1.8;overflow-x:auto;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;margin:12px 0 20px;background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--g30);font-size:13px}
+th{background:var(--dark);color:#fff;font-weight:600}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even){background:var(--g10)}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;color:#fff}
+.badge-green{background:var(--green)}
+.badge-orange{background:var(--orange)}
+.badge-red{background:var(--red)}
+.badge-blue{background:var(--blue)}
+.toc{background:#fff;border-radius:var(--radius);padding:20px 24px;margin-bottom:32px;box-shadow:var(--shadow)}
+.toc h3{margin-top:0;color:var(--dark)}
+.toc ol{padding-left:20px}
+.toc li{margin-bottom:4px}
+.toc a{color:var(--blue);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+.note{background:var(--light-blue);border-left:4px solid var(--blue);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:13px}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill="rgba(255,255,255,0.15)"/><path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div><h1>Copilot Adoption Dashboard</h1><div class="sub">Methodology &amp; Glossary</div></div>
+  </div>
+  <a href="index.html" class="btn-ghost">← Back to Dashboard</a>
+</header>
+
+<main>
+
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#data-source">Data Source &amp; Column Detection</a></li>
+    <li><a href="#kpis">KPI Cards (Overview)</a></li>
+    <li><a href="#tiers">Tier Classification (L-Tiers)</a></li>
+    <li><a href="#segments">Usage Segments (12-Week Rolling)</a></li>
+    <li><a href="#loyalty">Loyalty &amp; Churn Analysis</a></li>
+    <li><a href="#health">Health Score &amp; Adoption Stage</a></li>
+    <li><a href="#benchmarks">Benchmarks &amp; Targets</a></li>
+    <li><a href="#charts">Chart Descriptions</a></li>
+    <li><a href="#insights">Insights Tab Calculations</a></li>
+    <li><a href="#spanish">Spanish Language Support</a></li>
+  </ol>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="data-source">1. Data Source &amp; Column Detection</h2>
+
+<p>The dashboard accepts a CSV export from <strong>Microsoft Viva Insights</strong> (Copilot metrics query). Columns are detected automatically by normalizing each header to lowercase with all non-alphanumeric characters removed, then matching against regex patterns.</p>
+
+<h3>Required Columns</h3>
+<table>
+  <tr><th>Internal Key</th><th>English Column (example)</th><th>Spanish Column (example)</th><th>Purpose</th></tr>
+  <tr><td><code>pid</code></td><td>PersonId</td><td>PersonId</td><td>Unique user identifier</td></tr>
+  <tr><td><code>date</code></td><td>MetricDate</td><td>FechaMetrica</td><td>Week start date for the row</td></tr>
+  <tr><td><code>total</code></td><td>Total Copilot actions taken</td><td>Total de acciones de Copilot realizadas</td><td>Sum of all Copilot actions in that week</td></tr>
+  <tr><td><code>active</code></td><td>Total Copilot active days</td><td>Total de días activos de Copilot</td><td>Days the user used Copilot that week (0–7)</td></tr>
+</table>
+
+<h3>Optional Columns (enhance analysis)</h3>
+<table>
+  <tr><th>Internal Key</th><th>English Column</th><th>Spanish Column</th><th>Purpose</th></tr>
+  <tr><td><code>prompts</code></td><td>Copilot Chat (work) prompts submitted</td><td>Prompts enviados en Chat de Copilot (trabajo)</td><td>Chat prompts count</td></tr>
+  <tr><td><code>excel</code></td><td>Copilot actions taken in Excel</td><td>Acciones de Copilot realizadas en Excel</td><td>Excel-specific actions</td></tr>
+  <tr><td><code>outlook</code></td><td>Copilot actions taken in Outlook</td><td>Acciones de Copilot realizadas en Outlook</td><td>Outlook-specific actions</td></tr>
+  <tr><td><code>teams</code></td><td>Summarize chat actions taken using Copilot in Teams</td><td>Acciones realizadas para resumir chats con Copilot en Teams</td><td>Teams chat summarization actions</td></tr>
+</table>
+
+<div class="note">
+  <strong>Attribute columns</strong> (Organization, Country, Department, etc.) are auto-detected as any remaining column with 2–200 unique values among the first 500 rows. These become filter options.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="kpis">2. KPI Cards (Overview)</h2>
+
+<p>KPI cards show data for the <strong>most recent week</strong> in the dataset.</p>
+
+<table>
+  <tr><th>KPI</th><th>Calculation</th></tr>
+  <tr><td>Active Users</td><td>Count of unique PersonIds where <code>total &gt; 0</code> in the latest week</td></tr>
+  <tr><td>Total Users</td><td>Count of all unique PersonIds present in the latest week</td></tr>
+  <tr><td>Adoption Rate</td><td><code>(Active Users / Total Users) × 100</code></td></tr>
+  <tr><td>Total Actions</td><td>Sum of all <code>total</code> values in the latest week</td></tr>
+  <tr><td>Avg Actions / User</td><td><code>Total Actions / Active Users</code> (only counting active users)</td></tr>
+  <tr><td>Chat Prompts</td><td>Sum of all <code>prompts</code> values in the latest week</td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="tiers">3. Tier Classification (L-Tiers)</h2>
+
+<p>Each row (user × week) is classified based on <strong>active days that week</strong>:</p>
+
+<table>
+  <tr><th>Tier</th><th>Condition</th><th>Description</th></tr>
+  <tr><td><span class="badge badge-blue">L3 Expert</span></td><td><code>active_days ≥ 5</code></td><td>User actively used Copilot on 5+ days that week</td></tr>
+  <tr><td><span class="badge badge-blue" style="opacity:0.7">L2 Intermediate</span></td><td><code>active_days ≥ 3</code></td><td>Moderate weekly engagement (3–4 days)</td></tr>
+  <tr><td><span class="badge badge-orange">L1 Beginner</span></td><td><code>active_days ≥ 1</code></td><td>Minimal engagement (1–2 days)</td></tr>
+  <tr><td><span class="badge badge-red">Inactive</span></td><td><code>active_days = 0</code></td><td>Licensed but did not use Copilot that week</td></tr>
+</table>
+
+<div class="formula-box">
+if (active_days &gt;= 5)      → L3 Expert<br>
+else if (active_days &gt;= 3) → L2 Intermediate<br>
+else if (active_days &gt;= 1) → L1 Beginner<br>
+else                        → Inactive
+</div>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="segments">4. Usage Segments (12-Week Rolling Window)</h2>
+
+<p>Each user is classified using a <strong>12-week rolling window</strong> ending at each row's week. This captures sustained behavior, not just a single-week snapshot.</p>
+
+<table>
+  <tr><th>Segment</th><th>Conditions</th><th>Description</th></tr>
+  <tr><td><strong>Power User</strong></td><td><code>activeWeeks ≥ 9</code> AND <code>avgActions ≥ 15</code></td><td>Consistently active with high-volume usage</td></tr>
+  <tr><td><strong>Habitual User</strong></td><td><code>activeWeeks ≥ 9</code></td><td>Consistently active but moderate volume</td></tr>
+  <tr><td><strong>Novice User</strong></td><td><code>avgActions ≥ 1</code></td><td>Some usage but not yet habitual</td></tr>
+  <tr><td><strong>Low User</strong></td><td><code>avgActions &gt; 0</code></td><td>Minimal/sporadic usage</td></tr>
+  <tr><td><strong>Non-user</strong></td><td><code>avgActions = 0</code></td><td>No actions in the 12-week window</td></tr>
+</table>
+
+<div class="formula-box">
+window = last 12 weeks of data for this user (or fewer if less history)<br>
+avgActions = sum(total) across window / window.length<br>
+activeWeeks = count of weeks where total ≥ 1<br>
+isHabitual = activeWeeks ≥ 9<br><br>
+
+if (isHabitual AND avgActions ≥ 15) → Power User<br>
+else if (isHabitual)                → Habitual User<br>
+else if (avgActions ≥ 1)            → Novice User<br>
+else if (avgActions &gt; 0)           → Low User<br>
+else                                → Non-user
+</div>
+
+<div class="note">
+  The 12-week window is <strong>per-person</strong>. If a user only has 6 weeks of data, the window is 6 weeks. The window slides forward with each row chronologically.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="loyalty">5. Loyalty &amp; Churn Analysis</h2>
+
+<p>For each week, users are classified by comparing their activity against the <strong>prior 4 weeks</strong>:</p>
+
+<table>
+  <tr><th>Category</th><th>Definition</th></tr>
+  <tr><td><strong>New Users</strong></td><td>Active this week but <strong>never active</strong> in any of the prior 4 weeks</td></tr>
+  <tr><td><strong>Loyal Users</strong></td><td>Active this week AND active in <strong>all</strong> of the prior 4 weeks</td></tr>
+  <tr><td><strong>Churned Users</strong></td><td>Active in <strong>at least one</strong> of the prior 4 weeks but <strong>not active</strong> this week</td></tr>
+</table>
+
+<div class="formula-box">
+For each week W:<br>
+  activeNow = set of PIDs with total &gt; 0 in week W<br>
+  priorWeeks = 4 weeks immediately before W<br>
+  everPrior = set of PIDs active in ANY of priorWeeks<br>
+  allActivePrior = set of PIDs active in ALL of priorWeeks<br><br>
+
+  New Users    = activeNow − everPrior (active now, never before)<br>
+  Loyal Users  = activeNow ∩ allActivePrior (active now AND all 4 prior)<br>
+  Churned      = everPrior − activeNow (were active, now gone)
+</div>
+
+<h3>New-to-Churn (NC) Ratio</h3>
+<div class="formula-box">
+NC Ratio = New Users / max(Churned Users, 1)<br><br>
+Interpretation:<br>
+  &gt; 1.0 → More users joining than leaving (growth)<br>
+  = 1.0 → Equal inflows and outflows (stable)<br>
+  &lt; 1.0 → More users leaving than joining (decline)
+</div>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="health">6. Health Score &amp; Adoption Stage</h2>
+
+<p>The Health Score is a composite metric (0–100) combining four weighted dimensions:</p>
+
+<div class="formula-box">
+Health Score = (<br>
+&nbsp;&nbsp;(pctActive / 100) × 0.30 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Active rate contribution<br>
+&nbsp;&nbsp;+ min(pctPH / 20, 1) × 0.30 &nbsp;&nbsp;// Power+Habitual contribution<br>
+&nbsp;&nbsp;+ min(pctL3 / 25, 1) × 0.20 &nbsp;&nbsp;// L3 Expert contribution<br>
+&nbsp;&nbsp;+ min(ncRatio / 1.2, 1) × 0.20 // Retention contribution<br>
+) × 100
+</div>
+
+<table>
+  <tr><th>Component</th><th>Weight</th><th>Target (100% contribution)</th><th>What it measures</th></tr>
+  <tr><td>Active Rate</td><td>30%</td><td>100% of users active</td><td>Breadth of adoption</td></tr>
+  <tr><td>Power + Habitual %</td><td>30%</td><td>≥ 20% of users</td><td>Depth of habit formation</td></tr>
+  <tr><td>L3 Expert %</td><td>20%</td><td>≥ 25% of users</td><td>Intensity of weekly usage</td></tr>
+  <tr><td>NC Ratio</td><td>20%</td><td>≥ 1.2</td><td>User retention &amp; growth</td></tr>
+</table>
+
+<h3>Adoption Stage (based on Health Score)</h3>
+<table>
+  <tr><th>Stage</th><th>Health Score Range</th><th>Description</th></tr>
+  <tr><td><span class="badge badge-green">Frontier Firm</span></td><td>≥ 75</td><td>Strong, mature adoption across all dimensions</td></tr>
+  <tr><td><span class="badge badge-orange">Developing</span></td><td>50 – 74</td><td>Good progress; some areas need improvement</td></tr>
+  <tr><td><span class="badge badge-red">Early Stage</span></td><td>&lt; 50</td><td>Early adoption; significant growth opportunity</td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="benchmarks">7. Benchmarks &amp; Targets</h2>
+
+<p>Progress bars and recommendations use these targets derived from Microsoft's internal research on high-performing ("Frontier Firm") organizations:</p>
+
+<table>
+  <tr><th>Metric</th><th>Target</th><th>Source / Rationale</th></tr>
+  <tr><td>Active Rate</td><td>≥ 70%</td><td>Frontier Firm organizations maintain 70%+ weekly active rates</td></tr>
+  <tr><td>Power + Habitual Users</td><td>≥ 20%</td><td>Sustained habit means ≥9/12 weeks active — top orgs hit 20%+</td></tr>
+  <tr><td>L3 Expert Rate</td><td>≥ 25%</td><td>Quarter of users at 5+ days/week indicates deep integration</td></tr>
+  <tr><td>NC Ratio</td><td>≥ 1.2</td><td>20% more new users than churned ensures healthy growth</td></tr>
+  <tr><td>Avg Actions / Active User</td><td>≥ 15</td><td>Indicates meaningful, multi-scenario usage per week</td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="charts">8. Chart Descriptions</h2>
+
+<h3>Trends Tab</h3>
+<table>
+  <tr><th>Chart</th><th>Data</th><th>Calculation</th></tr>
+  <tr><td>Actions &amp; Prompts Over Time</td><td>Weekly aggregates</td><td>Sum of <code>total</code> and <code>prompts</code> per week across all filtered users. Secondary Y-axis shows active user count.</td></tr>
+  <tr><td>L-Tier Distribution Over Time</td><td>Stacked area</td><td>Count of users in each tier per week (percentage mode available)</td></tr>
+  <tr><td>Usage Segments Over Time</td><td>Stacked area</td><td>Count of users in each segment per week</td></tr>
+  <tr><td>App Breakdown Over Time</td><td>Stacked bar</td><td>Sum of <code>excel</code>, <code>outlook</code>, <code>teams</code> per week</td></tr>
+</table>
+
+<h3>Loyalty Tab</h3>
+<table>
+  <tr><th>Chart</th><th>Calculation</th></tr>
+  <tr><td>Loyalty &amp; Churn Trends</td><td>New, Loyal, Churned user counts per week (4-week lookback)</td></tr>
+  <tr><td>NC Ratio Over Time</td><td>New Users / max(Churned Users, 1) per week</td></tr>
+</table>
+
+<h3>Insights Tab</h3>
+<table>
+  <tr><th>Component</th><th>What it shows</th></tr>
+  <tr><td>KPI Progress Table</td><td>Each metric vs. benchmark target with progress bar (capped at 100%)</td></tr>
+  <tr><td>Health Score Gauge</td><td>Composite 0–100 score with color coding</td></tr>
+  <tr><td>Adoption Stage Badge</td><td>Frontier Firm / Developing / Early Stage</td></tr>
+  <tr><td>Recommendations</td><td>Auto-generated suggestions based on which metrics are below target</td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="insights">9. Insights Tab – Detailed Calculations</h2>
+
+<h3>Adoption Stage (Header Badge)</h3>
+<div class="formula-box">
+if (pctActive ≥ 70) → "Frontier Firm"<br>
+else if (pctActive ≥ 50) → "Developing"<br>
+else → "Early Stage"
+</div>
+
+<h3>Habit Formation Stage</h3>
+<div class="formula-box">
+if (pctPH ≥ 20) → "at Frontier Firm benchmark"<br>
+else if (pctPH ≥ 10) → "approaching Frontier Firm benchmark"<br>
+else → "below Frontier Firm benchmark"
+</div>
+
+<h3>Retention Health</h3>
+<div class="formula-box">
+if (ncRatio ≥ 1.2) → "Growing"<br>
+else if (ncRatio ≥ 0.8) → "Stable"<br>
+else → "At-Risk"
+</div>
+
+<h3>Trend Calculation</h3>
+<div class="formula-box">
+first4weeks = average weekly total actions in the first 4 weeks of data<br>
+last4weeks = average weekly total actions in the last 4 weeks of data<br>
+trendPct = ((last4weeks − first4weeks) / max(first4weeks, 1)) × 100
+</div>
+
+<h3>Progress Bar Values</h3>
+<div class="formula-box">
+pb_active = min(round(pctActive / 70 × 100), 100)<br>
+pb_ph     = min(round(pctPH / 20 × 100), 100)<br>
+pb_l3     = min(round(pctL3 / 25 × 100), 100)<br>
+pb_loyal  = min(round(loyalUsers / activeUsers × 100), 100)
+</div>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<h2 id="spanish">10. Spanish Language Support</h2>
+
+<p>The dashboard automatically detects column headers in both <strong>English and Spanish</strong>. Column names are normalized (lowercased, all non-alphanumeric characters removed) before matching. No configuration is needed — simply upload a CSV with Spanish headers from Viva Insights.</p>
+
+<h3>Supported Spanish Column Names</h3>
+<table>
+  <tr><th>Metric</th><th>Spanish Column Header</th></tr>
+  <tr><td>Total Actions</td><td>Total de acciones de Copilot realizadas</td></tr>
+  <tr><td>Active Days</td><td>Total de días activos de Copilot</td></tr>
+  <tr><td>Chat Prompts</td><td>Prompts enviados en Chat de Copilot (trabajo)</td></tr>
+  <tr><td>Excel Actions</td><td>Acciones de Copilot realizadas en Excel</td></tr>
+  <tr><td>Outlook Actions</td><td>Acciones de Copilot realizadas en Outlook</td></tr>
+  <tr><td>Teams Actions</td><td>Acciones de Copilot realizadas en Teams / Acciones realizadas para resumir chats con Copilot en Teams</td></tr>
+</table>
+
+<div class="note">
+  <strong>Date column:</strong> Accepts <code>FechaMetrica</code>, <code>Fecha</code>, as well as standard English names like <code>MetricDate</code>, <code>Date</code>, <code>WeekDate</code>.
+</div>
+
+<p style="margin-top:40px;color:var(--g90);font-size:12px;text-align:center">
+  Microsoft 365 Copilot Adoption Dashboard &mdash; Methodology Document v1.0
+</p>
+
+</main>
+</body>
+</html>

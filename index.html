@@ -466,6 +466,7 @@ td{padding:10px 16px;border-top:1px solid var(--g30);font-size:13px}
       </div>
     </div>
     <div class="dash-right">
+      <a class="btn-ghost" href="glossary.html" target="_blank" style="text-decoration:none;margin-right:8px">📖 Glossary</a>
       <button class="btn-ghost" onclick="goToLanding()">← New File</button>
     </div>
   </header>
@@ -623,14 +624,14 @@ const LTIER_COLORS = {
 };
 const APP_COLORS = {Excel:'#217346', Outlook:C.blue, Teams:'#5B5EA6'};
 const METRIC_PATTERNS = {
-  pid:    /^(personid|person_id|userid|user_id|employeeid|empid)$/,
-  date:   /^(metricdate|metric_date|date|weekdate|week_date|weekstart|periodstart|startdate)$/,
-  total:  /totalcopilotaction|total.*copilot.*action|copilot.*total.*action/,
-  active: /totalcopilotactiveday|total.*copilot.*active.*day|activedays/,
-  prompts:/copilotchat.*prompt|chat.*prompt|promptssubmitted|copilotprompt/,
-  excel:  /copilot.*excel|excel.*action|excelcopilot/,
-  outlook:/copilot.*outlook|outlook.*action|outlookcopilot/,
-  teams:  /summarize.*teams|teams.*summarize|teamschat|copilot.*teams.*chat/
+  pid:    /^(personid|person_id|userid|user_id|employeeid|empid|idpersona|identificadordeusuario)$/,
+  date:   /^(metricdate|metric_date|date|weekdate|week_date|weekstart|periodstart|startdate|fechametrica|fecha|fechadelamtrica)$/,
+  total:  /totalcopilotaction|total.*copilot.*action|copilot.*total.*action|totaldeacciones.*copilot.*realizad|accionesdecopilotrealizad/,
+  active: /totalcopilotactiveday|total.*copilot.*active.*day|activedays|totaldediasactivosdecopilot|diasactivosdecopilot/,
+  prompts:/copilotchat.*prompt|chat.*prompt|promptssubmitted|copilotprompt|promptsenviadosenchatdecopilottrabajo|promptsenviadosenchatdecopilot(?!.*web)/,
+  excel:  /copilot.*excel|excel.*action|excelcopilot|accionesdecopilotrealizadasenexcel|copilotrealizad.*excel/,
+  outlook:/copilot.*outlook|outlook.*action|outlookcopilot|accionesdecopilotrealizadasenoutlook|copilotrealizad.*outlook/,
+  teams:  /summarize.*teams|teams.*summarize|teamschat|copilot.*teams.*chat|accionesrealizadaspararesumirchat.*teams|accionesdecopilotrealizadasenteams|copilotrealizad.*teams/
 };
 const SKIP_COLS = new Set(['weekenddays','isactive','populationtype','isinternal',
   'ismanager','isoccupied','fte','layercount']);
